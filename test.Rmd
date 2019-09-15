@@ -7,6 +7,17 @@ This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute
 
 Try executing this chunk by clicking the *Run* button within the chunk or by placing your cursor inside it and pressing *Ctrl+Shift+Enter*. 
 
+0915GWK)
+command line below is not working 
+```
+git config --global user.email "gwpia0409@gmail.com"
+```
+instead, line below is working
+```
+git config --global user.name "DotchGNU"
+```
+I don't know why... but it's working 
+
 ```{r}
 plot(cars)
 ```
