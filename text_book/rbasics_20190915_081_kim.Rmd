@@ -1316,7 +1316,46 @@ my_df
 6. Repeat the previous exercise, but this time order `my_df` so that the states are ordered from least populous to most populous. Hint: create an object `ind` that stores the indexes needed to order the population values. Then use the bracket operator `[` to re-order each column in the data frame.
 
 ```{r}
+library(dslabs)
+data(murders)
+murders <- mutate(murders, "rank" = rank(murders$population))
+ind <- order(murders$population)
 
+states <- murders$state[ind]
+pop <- murders$population[ind]
+ranks <- murders$rank[ind]
+
+my_df <- data.frame("State" = states, "Population" = pop, "Rank" = ranks)
+my_df
+```
+
+
+7. The `na_example` vector represents a series of counts. You can quickly examine the object using:
+
+```{r}
+data("na_example")  
+str(na_example)
+```
+
+However, when we compute the average with the function `mean`, we obtain an NA:
+
+```{r}
+mean(na_example)
+```
+
+The `is.na` function returns a logical vector that tells us which entries are `NA`. Assign this logical vector to an object called ind and determine how many NAs does `na_example` have.
+
+```{r}
+na_example %>% is.na() %>% sum()
+```
+
+
+8. Now compute the average again, but only for the entries that are not `NA`. Hint: remember the `!` operator.
+
+```{r}
+#logical indicator
+ind <- is.na(na_example)
+na_example[!ind] %>% mean()
 ```
 
 
@@ -1405,6 +1444,48 @@ murders$state[order(murder_rate)]
 ***
 
 # 3.13 Exercises 
+
+1. Previously we created this data frame:
+
+```{r}
+temp <- c(35, 88, 42, 84, 81, 30)
+city <- c("Beijing", "Lagos", "Paris", "Rio de Janeiro", "San Juan", "Toronto")
+city_temps <- data.frame(name = city, temperature = temp)
+```
+
+Remake the data frame using the code above, but add a line that converts the temperature from Fahrenheit to Celsius. The conversion is 
+$$
+C = 5/9*(F-32)
+$$
+
+```{r}
+temp <- c(35, 88, 42, 84, 81, 30)
+city <- c("Beijing", "Lagos", "Paris", "Rio de Janeiro", "San Juan", "Toronto")
+
+temp_C <- 5/9*(temp-32)
+city_temps <- data.frame(name = city, temperature = temp_C)
+city_temps
+```
+
+
+
+2. What is the following sum $ 1+1/2^2+1/3^2+...+1/100^2$?
+Hing : thanks to Euler, we know it should be close to $\pi^2/6$
+
+```{r}
+n <- 1:100
+sum(1/(n^2))
+```
+
+
+
+3. Compute the per 100,000 murder rate for each state and store it in the object `murder_rate`. Then compute the average murder rate for the US using the function mean. What is the average?
+
+```{r}
+murder_rate <- murders$total / murders$population * 100000
+mean(murder_rate)
+```
+
 
 ***
 
@@ -1550,6 +1631,84 @@ print(which(murders$state %in% c("New York", "Florida", "Texas")))
 
 # 3.15 Exercises
 
+Start by loading the library and data.
+
+```{r}
+library(dslabs)
+data(murders)
+```
+
+1. Compute the per 100,000 murder rate for each state and store it in an object called `murder_rate`. Then use logical operators to create a logical vector named `low` that tells us which entries of `murder_rate` are lower than 1.
+
+```{r}
+murders <- murders %>% mutate("murder_rate" = total / population * 100000)
+low <- ifelse(murders$murder_rate < 1, TRUE, FALSE)
+low
+```
+
+
+
+2. Now use the results from the previous exercise and the function which to determine the indices of `murder_rate` associated with values lower than 1.
+
+```{r}
+which(murder_rate < 1)
+```
+
+
+
+3. Use the results from the previous exercise to report the names of the states with murder rates lower than 1.
+
+```{r}
+murders$state[which(murder_rate<1)]
+```
+
+
+
+4. Now extend the code from exercise 2 and 3 to report the states in the Northeast with murder rates lower than 1. 
+Hint: use the previously defined logical vector low and the logical operator `&`.
+
+```{r}
+northeast <- ifelse(murders$region == "Northeast", TRUE, FALSE) 
+murders$state[northeast & low]
+```
+
+
+
+5. In a previous exercise we computed the murder rate for each state and the average of these numbers. How many states are below the average?
+
+```{r}
+sum(murder_rate < mean(murder_rate))
+```
+
+
+
+6. Use the match function to identify the states with abbreviations AK, MI, and IA. Hint: start by defining an index of the entries of `murders$abb` that match the three abbreviations, then use the [ operator to extract the states.
+
+```{r}
+murders$state[match(c("AK", "MI", "IA"), murders$abb)]
+```
+
+```{r}
+#왜 아래는 위와 결과가 다른가? 
+murders$state[murders$abb == c("AK", "MI", "IA")]
+```
+
+
+7. Use the `%in%` operator to create a logical vector that answers the question: which of the following are actual abbreviations: MA, ME, MI, MO, MU ?
+
+```{r}
+ind <- which(murders$abb %in% c("MA", "ME", "MI", "MO", "MU"))
+murders$state[ind]
+```
+
+8. Extend the code you used in exercise 7 to report the one entry that is **not** an actual abbreviation. Hint: use the ! operator, which turns FALSE into TRUE and vice versa, then which to obtain an index.
+
+```{r}
+abbs <- c("MA", "ME", "MI", "MO", "MU")
+ind <- !(abbs %in% murders$abb)
+abbs[ind]
+```
+
 ***
 
 # 3.16 Basic plots 
@@ -1626,9 +1785,35 @@ image(x)
 
 # 3.17 Exercises 
 
+1. We made a plot of total murders versus population and noted a strong relationship. Not surprisingly, states with larger populations had more murders.
+
+```{r}
+library(dslabs)
+data(murders)
+population_in_millions <- murders$population/10^6
+total_gun_murders <- murders$total
+plot(population_in_millions, total_gun_murders)
+```
+
+Keep in mind that many states have populations below 5 million and are bunched up. We may gain further insights from making this plot in the log scale. Transform the variables using the log10 transformation and then plot them.
+
+```{r}
+plot(log10(murders$population), murders$total)
+```
 
 
 
+2. Create a histogram of the state populations.
+
+```{r}
+hist(murders$population)
+```
+
+3. Generate boxplots of the state populations by region.
+
+```{r}
+boxplot(population~region, data = murders)
+```
 
 
 
