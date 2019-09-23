@@ -3204,19 +3204,28 @@ as.numeric(x)</code></pre>
 <p>Say we want to rank the states from least to most gun murders. The function <strong><code>sort</code> sorts a vector in increasing order.</strong> We can therefore see the largest number of gun murders by typing:</p>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxubGlicmFyeShkc2xhYnMpXG5kYXRhKG11cmRlcnMpXG4jIHNvcnQgOiDtlbTri7kgY29sdW1u7J2EIOyYpOumhOywqOyInCDsoJXroKwgKGRlZmF1bHQpXG5zb3J0KG11cmRlcnMkdG90YWwpXG5gYGAifQ== -->
-<pre class="r"><code>library(dslabs)
-data(murders)
-# sort : 해당 column을 오름차순 정렬 (default)
-sort(murders$total)</code></pre>
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuIyBzb3J0IDog7ZW064u5IGNvbHVtbuydhCDsmKTrpoTssKjsiJwg7KCV66CsIChkZWZhdWx0KVxuc29ydChtdXJkZXJzJHRvdGFsKVxuXG5gYGAifQ== -->
+<pre class="r"><code># sort : 해당 column을 오름차순 정렬 (default)
+sort(murders$total)
+</code></pre>
 <!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiIFsxXSAgICAyICAgIDQgICAgNSAgICA1ICAgIDcgICAgOCAgIDExICAgMTIgICAxMiAgIDE2ICAgMTkgICAyMSAgIDIyXG5bMTRdICAgMjcgICAzMiAgIDM2ICAgMzggICA1MyAgIDYzICAgNjUgICA2NyAgIDg0ICAgOTMgICA5MyAgIDk3ICAgOTdcblsyN10gICA5OSAgMTExICAxMTYgIDExOCAgMTIwICAxMzUgIDE0MiAgMjA3ICAyMTkgIDIzMiAgMjQ2ICAyNTAgIDI4NlxuWzQwXSAgMjkzICAzMTAgIDMyMSAgMzUxICAzNjQgIDM3NiAgNDEzICA0NTcgIDUxNyAgNjY5ICA4MDUgMTI1N1xuIn0= -->
+<pre><code> [1]    2    4    5    5    7    8   11   12   12   16   19   21   22
+[14]   27   32   36   38   53   63   65   67   84   93   93   97   97
+[27]   99  111  116  118  120  135  142  207  219  232  246  250  286
+[40]  293  310  321  351  364  376  413  457  517  669  805 1257</code></pre>
+<!-- rnb-output-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuaGVhZChtdXJkZXJzKVxuYGBgIn0= -->
-<pre class="r"><code>head(murders)</code></pre>
-<!-- rnb-source-end -->
+<!-- rnb-frame-begin eyJtZXRhZGF0YSI6eyJjbGFzc2VzIjpbImRhdGEuZnJhbWUiXSwibmNvbCI6NiwibnJvdyI6Nn0sInJkZiI6IlVrUllNd3BZQ2dBQUFBTUFBd1lBQUFNRkFBQUFBQVZWVkVZdE9BQUFCQUlBQUFBQkFBUUFDUUFBQUFGNEFBQURFd0FBQUFZQUFBQVFBQUFBQmdBRUFBa0FBQUFIUVd4aFltRnRZUUFFQUFrQUFBQUdRV3hoYzJ0aEFBUUFDUUFBQUFkQmNtbDZiMjVoQUFRQUNRQUFBQWhCY210aGJuTmhjd0FFQUFrQUFBQUtRMkZzYVdadmNtNXBZUUFFQUFrQUFBQUlRMjlzYjNKaFpHOEFBQUFRQUFBQUJnQUVBQWtBQUFBQ1FVd0FCQUFKQUFBQUFrRkxBQVFBQ1FBQUFBSkJXZ0FFQUFrQUFBQUNRVklBQkFBSkFBQUFBa05CQUFRQUNRQUFBQUpEVHdBQUF3MEFBQUFHQUFBQUFnQUFBQVFBQUFBRUFBQUFBZ0FBQUFRQUFBQUVBQUFFQWdBQUFBRUFCQUFKQUFBQUJteGxkbVZzY3dBQUFCQUFBQUFFQUFRQUNRQUFBQWxPYjNKMGFHVmhjM1FBQkFBSkFBQUFCVk52ZFhSb0FBUUFDUUFBQUExT2IzSjBhQ0JEWlc1MGNtRnNBQVFBQ1FBQUFBUlhaWE4wQUFBRUFnQUFBQUVBQkFBSkFBQUFCV05zWVhOekFBQUFFQUFBQUFFQUJBQUpBQUFBQm1aaFkzUnZjZ0FBQVA0QUFBQU9BQUFBQmtGU083WUFBQUFBUVNXc3JnQUFBQUJCV0dJMFFBQUFBRUZHUHljQUFBQUFRWUhEbWlBQUFBQkJVeTlUQUFBQUFBQUFBQTRBQUFBR1FHRGdBQUFBQUFCQU13QUFBQUFBQUVCdEFBQUFBQUFBUUZkQUFBQUFBQUJBazZRQUFBQUFBRUJRUUFBQUFBQUFBQUFBRGdBQUFBWkFCcGhyZmhXaHpFQUZac2Zsbk1wRVFBMEpSWmVsUmFsQUNZUGU5TnAvS0VBSy9qdzViU25JUC9TdDQwOWF0M2dBQUFRQ0FBQUFBUUFFQUFrQUFBQUZibUZ0WlhNQUFBQVFBQUFBQmdBRUFBa0FBQUFGYzNSaGRHVUFCQUFKQUFBQUEyRmlZZ0FFQUFrQUFBQUdjbVZuYVc5dUFBUUFDUUFBQUFwd2IzQjFiR0YwYVc5dUFBUUFDUUFBQUFWMGIzUmhiQUFFQUFrQUFBQUxiWFZ5WkdWeVgzSmhkR1VBQUFRQ0FBQUFBUUFFQUFrQUFBQUpjbTkzTG01aGJXVnpBQUFBRFFBQUFBS0FBQUFBQUFBQUJnQUFCQUlBQUFQL0FBQUFFQUFBQUFFQUJBQUpBQUFBQ21SaGRHRXVabkpoYldVQUFBRCtBQUFFQWdBQUFBRUFCQUFKQUFBQUIyOXdkR2x2Ym5NQUFBSVRBQUFBQlFBQUFCQUFBQUFCQUFRQUNRQUFBQUZ5QUFBQUVBQUFBQUVBQkFBSkFBQUFEM1Z1Ym1GdFpXUXRZMmgxYm1zdE13QUFBQW9BQUFBQkFBQUFBUUFBQUEwQUFBQUJBQUFBQmdBQUFBMEFBQUFCQUFBQUJnQUFCQUlBQUFUL0FBQUFFQUFBQUFVQUJBQUpBQUFBQm1WdVoybHVaUUFFQUFrQUFBQUZiR0ZpWld3QUJBQUpBQUFBRG5KdmQyNWhiV1Z6TG5CeWFXNTBBQVFBQ1FBQUFBcHliM2R6TG5SdmRHRnNBQVFBQ1FBQUFBcGpiMnh6TG5SdmRHRnNBQUFBL2dBQUFQND0ifQ== -->
+<div data-pagedtable="false">
+<script data-pagedtable-source type="application/json">
+{"columns":[{"label":[""],"name":["_rn_"],"type":[""],"align":["left"]},{"label":["state"],"name":[1],"type":["chr"],"align":["left"]},{"label":["abb"],"name":[2],"type":["chr"],"align":["left"]},{"label":["region"],"name":[3],"type":["fctr"],"align":["left"]},{"label":["population"],"name":[4],"type":["dbl"],"align":["right"]},{"label":["total"],"name":[5],"type":["dbl"],"align":["right"]},{"label":["murder_rate"],"name":[6],"type":["dbl"],"align":["right"]}],"data":[{"1":"Alabama","2":"AL","3":"South","4":"4779736","5":"135","6":"2.824424","_rn_":"1"},{"1":"Alaska","2":"AK","3":"West","4":"710231","5":"19","6":"2.675186","_rn_":"2"},{"1":"Arizona","2":"AZ","3":"West","4":"6392017","5":"232","6":"3.629527","_rn_":"3"},{"1":"Arkansas","2":"AR","3":"South","4":"2915918","5":"93","6":"3.189390","_rn_":"4"},{"1":"California","2":"CA","3":"West","4":"37253956","5":"1257","6":"3.374138","_rn_":"5"},{"1":"Colorado","2":"CO","3":"West","4":"5029196","5":"65","6":"1.292453","_rn_":"6"}],"options":{"columns":{"min":{},"max":[10],"total":[6]},"rows":{"min":[10],"max":[10],"total":[6]},"pages":{}}}
+  </script>
+</div>
+<!-- rnb-frame-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
 <!-- rnb-text-end -->
@@ -3238,57 +3247,74 @@ sort(murders$total)</code></pre>
 <p>The function <code>order</code> is closer to what we want. It takes a <strong>vector as input</strong> and <strong>returns the vector of indexes</strong> that sorts the input vector. This may sound confusing so let’s look at a simple example. We can create a vector and sort it:</p>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxueCA8LSBjKDMxLCA0LCAxNSwgODIsIDY1KVxuc29ydCh4KVxuYGBgIn0= -->
-<pre class="r"><code>x &lt;- c(31, 4, 15, 82, 65)
-sort(x)</code></pre>
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuc29ydCh4KVxuXG5gYGAifQ== -->
+<pre class="r"><code>sort(x)
+</code></pre>
 <!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiWzFdICA0IDE1IDMxIDY1IDgyXG4ifQ== -->
+<pre><code>[1]  4 15 31 65 82</code></pre>
+<!-- rnb-output-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
 <p>Rather than sort the input vector, the function <code>order</code> returns the index that sorts input vector:</p>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuIyBvcmRlcu2VqOyImOuKlCBzb3J0aW5n6rO8IOuLrOumrCDsmKTrpoTssKjsiJztlZwg6rKw6rO87J2YIGluZGV466W8IHJldHVybiBcbiMgb3JkZXIoeCkgOiB466W8IOyYpOumhOywqOyInOycvOuhnCDsoJXroKztlZjquLAg7JyE7ZWcIOybkOyGjOydmCBpbmRleOulvCDsiJzshJzrjIDroZwgcmV0dXJuXG5pbmRleCA8LSBvcmRlcih4KVxuaW5kZXhcbmBgYCJ9 -->
-<pre class="r"><code># order함수는 sorting과 달리 오름차순한 결과의 index를 return 
-# order(x) : x를 오름차순으로 정렬하기 위한 원소의 index를 순서대로 return
-index &lt;- order(x)
-index</code></pre>
-<!-- rnb-source-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuIyB4W10gOiBbXeuCtOydmCDsobDqsbTsl5Ag65Sw6528IGluZGV47JeQIOyVjOunnuuKlCBlbnRyeeulvCByZXR1cm5cbiMgP1wiW1wiICMjIGV4dGFjdCBvciByZXBsYWNlIHBhcnRzIG9mIGFuIG9iamVjdCBcbnhbaW5kZXhdXG5gYGAifQ== -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuIyB4W10gOiBbXeuCtOydmCDsobDqsbTsl5Ag65Sw6528IGluZGV47JeQIOyVjOunnuuKlCBlbnRyeeulvCByZXR1cm5cbiMgP1wiW1wiICMjIGV4dGFjdCBvciByZXBsYWNlIHBhcnRzIG9mIGFuIG9iamVjdCBcbnhbaW5kZXhdXG5cbmBgYCJ9 -->
 <pre class="r"><code># x[] : []내의 조건에 따라 index에 알맞는 entry를 return
 # ?&quot;[&quot; ## extact or replace parts of an object 
-x[index]</code></pre>
+x[index]
+</code></pre>
 <!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiWzFdICA0IDE1IDMxIDY1IDgyXG4ifQ== -->
+<pre><code>[1]  4 15 31 65 82</code></pre>
+<!-- rnb-output-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
 <p>The second entry of <code>x</code> is the smallest, so <code>order(x)</code> starts with <code>2</code>. The next smallest is the third entry, so the second entry is <code>3</code> and so on.</p>
 <p>How does this help us order the states by murders? First, remember that the entries of vectors you access with <code>$</code> follow the <strong>same order as the rows in the table.</strong>(즉, index는 column이 다르더라도 동일) For example, these two vectors containing state names and abbreviations respectively are matched by their order:</p>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxubXVyZGVycyRzdGF0ZVsxOjEwXVxuYGBgIn0= -->
-<pre class="r"><code>murders$state[1:10]</code></pre>
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxubXVyZGVycyRzdGF0ZVsxOjEwXVxuXG5gYGAifQ== -->
+<pre class="r"><code>murders$state[1:10]
+</code></pre>
 <!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiIFsxXSBcIkFsYWJhbWFcIiAgICAgICAgICAgICAgXCJBbGFza2FcIiAgICAgICAgICAgICAgXG4gWzNdIFwiQXJpem9uYVwiICAgICAgICAgICAgICBcIkFya2Fuc2FzXCIgICAgICAgICAgICBcbiBbNV0gXCJDYWxpZm9ybmlhXCIgICAgICAgICAgIFwiQ29sb3JhZG9cIiAgICAgICAgICAgIFxuIFs3XSBcIkNvbm5lY3RpY3V0XCIgICAgICAgICAgXCJEZWxhd2FyZVwiICAgICAgICAgICAgXG4gWzldIFwiRGlzdHJpY3Qgb2YgQ29sdW1iaWFcIiBcIkZsb3JpZGFcIiAgICAgICAgICAgICBcbiJ9 -->
+<pre><code> [1] &quot;Alabama&quot;              &quot;Alaska&quot;              
+ [3] &quot;Arizona&quot;              &quot;Arkansas&quot;            
+ [5] &quot;California&quot;           &quot;Colorado&quot;            
+ [7] &quot;Connecticut&quot;          &quot;Delaware&quot;            
+ [9] &quot;District of Columbia&quot; &quot;Florida&quot;             </code></pre>
+<!-- rnb-output-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxubXVyZGVycyRhYmJbMToxMF1cbmBgYCJ9 -->
-<pre class="r"><code>murders$abb[1:10]</code></pre>
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxubXVyZGVycyRhYmJbMToxMF1cblxuYGBgIn0= -->
+<pre class="r"><code>murders$abb[1:10]
+</code></pre>
 <!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiIFsxXSBcIkFMXCIgXCJBS1wiIFwiQVpcIiBcIkFSXCIgXCJDQVwiIFwiQ09cIiBcIkNUXCIgXCJERVwiIFwiRENcIiBcIkZMXCJcbiJ9 -->
+<pre><code> [1] &quot;AL&quot; &quot;AK&quot; &quot;AZ&quot; &quot;AR&quot; &quot;CA&quot; &quot;CO&quot; &quot;CT&quot; &quot;DE&quot; &quot;DC&quot; &quot;FL&quot;</code></pre>
+<!-- rnb-output-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
 <p>This means we can order the state names by their total murders. We first obtain the index that orders the vectors according to murder totals and then index the state names vector:</p>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuI3NvcnRpbmcgZGF0YWZyYW1lIGJ5ICdvcmRlcicgXG4j66i87KCAIOyYpOumhOywqOyInOyXkCDrjIDtlZwgaW5kZXjrpbwgaW5k7JeQIOyggOyepe2VmOqzoCBcbmluZCA8LSBvcmRlcihtdXJkZXJzJHRvdGFsKVxubXVyZGVycyRhYmJbaW5kXVxuYGBgIn0= -->
-<pre class="r"><code>#sorting dataframe by 'order' 
-#먼저 오름차순에 대한 index를 ind에 저장하고 
-ind &lt;- order(murders$total)
-murders$abb[ind]</code></pre>
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxubXVyZGVycyRhYmJbaW5kXVxuXG5gYGAifQ== -->
+<pre class="r"><code>murders$abb[ind]
+</code></pre>
 <!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiIFsxXSBcIlZUXCIgXCJORFwiIFwiTkhcIiBcIldZXCIgXCJISVwiIFwiU0RcIiBcIk1FXCIgXCJJRFwiIFwiTVRcIiBcIlJJXCIgXCJBS1wiIFwiSUFcIiBcIlVUXCJcblsxNF0gXCJXVlwiIFwiTkVcIiBcIk9SXCIgXCJERVwiIFwiTU5cIiBcIktTXCIgXCJDT1wiIFwiTk1cIiBcIk5WXCIgXCJBUlwiIFwiV0FcIiBcIkNUXCIgXCJXSVwiXG5bMjddIFwiRENcIiBcIk9LXCIgXCJLWVwiIFwiTUFcIiBcIk1TXCIgXCJBTFwiIFwiSU5cIiBcIlNDXCIgXCJUTlwiIFwiQVpcIiBcIk5KXCIgXCJWQVwiIFwiTkNcIlxuWzQwXSBcIk1EXCIgXCJPSFwiIFwiTU9cIiBcIkxBXCIgXCJJTFwiIFwiR0FcIiBcIk1JXCIgXCJQQVwiIFwiTllcIiBcIkZMXCIgXCJUWFwiIFwiQ0FcIlxuIn0= -->
+<pre><code> [1] &quot;VT&quot; &quot;ND&quot; &quot;NH&quot; &quot;WY&quot; &quot;HI&quot; &quot;SD&quot; &quot;ME&quot; &quot;ID&quot; &quot;MT&quot; &quot;RI&quot; &quot;AK&quot; &quot;IA&quot; &quot;UT&quot;
+[14] &quot;WV&quot; &quot;NE&quot; &quot;OR&quot; &quot;DE&quot; &quot;MN&quot; &quot;KS&quot; &quot;CO&quot; &quot;NM&quot; &quot;NV&quot; &quot;AR&quot; &quot;WA&quot; &quot;CT&quot; &quot;WI&quot;
+[27] &quot;DC&quot; &quot;OK&quot; &quot;KY&quot; &quot;MA&quot; &quot;MS&quot; &quot;AL&quot; &quot;IN&quot; &quot;SC&quot; &quot;TN&quot; &quot;AZ&quot; &quot;NJ&quot; &quot;VA&quot; &quot;NC&quot;
+[40] &quot;MD&quot; &quot;OH&quot; &quot;MO&quot; &quot;LA&quot; &quot;IL&quot; &quot;GA&quot; &quot;MI&quot; &quot;PA&quot; &quot;NY&quot; &quot;FL&quot; &quot;TX&quot; &quot;CA&quot;</code></pre>
+<!-- rnb-output-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
 <div id="vt--ca-" class="section level5">
@@ -3301,36 +3327,51 @@ murders$abb[ind]</code></pre>
 <p>If we are only interested in the entry with the largest value, we can use <code>max</code> for the value:</p>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuIyBtYXgoKSA6IHZlY3RvcuydmCDstZzrjJPqsJIgcmV0dXJuXG5tYXgobXVyZGVycyR0b3RhbClcbmBgYCJ9 -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuIyBtYXgoKSA6IHZlY3RvcuydmCDstZzrjJPqsJIgcmV0dXJuXG5tYXgobXVyZGVycyR0b3RhbClcblxuYGBgIn0= -->
 <pre class="r"><code># max() : vector의 최댓값 return
-max(murders$total)</code></pre>
+max(murders$total)
+</code></pre>
 <!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiWzFdIDEyNTdcbiJ9 -->
+<pre><code>[1] 1257</code></pre>
+<!-- rnb-output-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
 <p>and <code>which.max</code> for the index of the largest value:</p>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuI3doaWNoLm1heCgpIDogdmVjdG9yIOy1nOuMk+qwkuydmCDsnITsuZggcmV0dXJuXG53aGljaC5tYXgobXVyZGVycyR0b3RhbClcbmBgYCJ9 -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuI3doaWNoLm1heCgpIDogdmVjdG9yIOy1nOuMk+qwkuydmCDsnITsuZggcmV0dXJuXG53aGljaC5tYXgobXVyZGVycyR0b3RhbClcblxuYGBgIn0= -->
 <pre class="r"><code>#which.max() : vector 최댓값의 위치 return
-which.max(murders$total)</code></pre>
+which.max(murders$total)
+</code></pre>
 <!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiWzFdIDVcbiJ9 -->
+<pre><code>[1] 5</code></pre>
+<!-- rnb-output-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxubXVyZGVycyRzdGF0ZVt3aGljaC5tYXgobXVyZGVycyR0b3RhbCldXG5gYGAifQ== -->
-<pre class="r"><code>murders$state[which.max(murders$total)]</code></pre>
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxubXVyZGVycyRzdGF0ZVt3aGljaC5tYXgobXVyZGVycyR0b3RhbCldXG5cbmBgYCJ9 -->
+<pre class="r"><code>murders$state[which.max(murders$total)]
+</code></pre>
 <!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiWzFdIFwiQ2FsaWZvcm5pYVwiXG4ifQ== -->
+<pre><code>[1] &quot;California&quot;</code></pre>
+<!-- rnb-output-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
 <div id="---total----return--" class="section level4">
 <h4>&gt; 위와 다른 방식이지만, total 이 최대인 주를 return받을 수 있음</h4>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuaW5kX21heCA8LSB3aGljaC5tYXgobXVyZGVycyR0b3RhbClcbm11cmRlcnMkc3RhdGVbaW5kX21heF1cbmBgYCJ9 -->
-<pre class="r"><code>ind_max &lt;- which.max(murders$total)
-murders$state[ind_max]</code></pre>
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxubXVyZGVycyRzdGF0ZVtpbmRfbWF4XVxuXG5gYGAifQ== -->
+<pre class="r"><code>murders$state[ind_max]
+</code></pre>
 <!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiWzFdIFwiQ2FsaWZvcm5pYVwiXG4ifQ== -->
+<pre><code>[1] &quot;California&quot;</code></pre>
+<!-- rnb-output-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
 <p>For the minimum, we can use <code>min</code> and <code>which.min</code> in the same way.</p>
@@ -3369,11 +3410,16 @@ murders$state[ind_max]</code></pre>
 <p>Another common source of unnoticed errors in R is the use of <strong>recycling</strong>. We saw that vectors are added <strong>elementwise</strong>. So if the vectors <strong>don’t match in length</strong>, it is natural to assume that we should get an error. But we don’t. Notice what happens:</p>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxueCA8LSBjKDEsMiwzKVxueSA8LSBjKDEwLDIwLDMwLDQwLDUwLDYwLDcwKVxueCt5XG5gYGAifQ== -->
-<pre class="r"><code>x &lt;- c(1,2,3)
-y &lt;- c(10,20,30,40,50,60,70)
-x+y</code></pre>
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxueCt5XG5cbmBgYCJ9 -->
+<pre class="r"><code>x+y
+</code></pre>
 <!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoibG9uZ2VyIG9iamVjdCBsZW5ndGggaXMgbm90IGEgbXVsdGlwbGUgb2Ygc2hvcnRlciBvYmplY3QgbGVuZ3RoXG4ifQ== -->
+<pre><code>longer object length is not a multiple of shorter object length</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiWzFdIDExIDIyIDMzIDQxIDUyIDYzIDcxXG4ifQ== -->
+<pre><code>[1] 11 22 33 41 52 63 71</code></pre>
+<!-- rnb-output-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
 <p>We do get a warning but no error. For the output, R has recycled the numbers in x. Notice the last digit of numbers in the output.</p>
@@ -3385,10 +3431,6 @@ x+y</code></pre>
 <p>For these exercises we will use the US murders dataset. Make sure you load it prior to starting.</p>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxubGlicmFyeShkc2xhYnMpXG5kYXRhKFwibXVyZGVyc1wiKVxuYGBgIn0= -->
-<pre class="r"><code>library(dslabs)
-data(&quot;murders&quot;)</code></pre>
-<!-- rnb-source-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
 <ol style="list-style-type: decimal">
@@ -3400,8 +3442,8 @@ data(&quot;murders&quot;)</code></pre>
 <pre class="r"><code>pop[1]
 </code></pre>
 <!-- rnb-source-end -->
-<!-- rnb-output-begin eyJkYXRhIjoiWzFdIDU2MzYyNlxuIn0= -->
-<pre><code>[1] 563626</code></pre>
+<!-- rnb-output-begin eyJkYXRhIjoiWzFdIDQ3Nzk3MzZcbiJ9 -->
+<pre><code>[1] 4779736</code></pre>
 <!-- rnb-output-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
@@ -3452,11 +3494,6 @@ data(&quot;murders&quot;)</code></pre>
 </ol>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxudGVtcCA8LSBjKDM1LCA4OCwgNDIsIDg0LCA4MSwgMzApXG5jaXR5IDwtIGMoXCJCZWlqaW5nXCIsIFwiTGFnb3NcIiwgXCJQYXJpc1wiLCBcIlJpbyBkZSBKYW5laXJvXCIsIFwiU2FuIEp1YW5cIiwgXCJUb3JvbnRvXCIpXG5jaXR5X3RlbXBzIDwtIGRhdGEuZnJhbWUobmFtZSA9IGNpdHksIHRlbXBlcmF0dXJlID0gdGVtcClcbmBgYCJ9 -->
-<pre class="r"><code>temp &lt;- c(35, 88, 42, 84, 81, 30)
-city &lt;- c(&quot;Beijing&quot;, &quot;Lagos&quot;, &quot;Paris&quot;, &quot;Rio de Janeiro&quot;, &quot;San Juan&quot;, &quot;Toronto&quot;)
-city_temps &lt;- data.frame(name = city, temperature = temp)</code></pre>
-<!-- rnb-source-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
 <p>Use the <code>rank</code> function to determine the population rank of each state from smallest population size to biggest. Save these ranks in an object called ranks, then create a data frame with the state name and its rank. Call the data frame <code>my_df</code>.</p>
