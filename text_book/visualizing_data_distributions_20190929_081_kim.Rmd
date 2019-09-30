@@ -122,7 +122,7 @@ This particular plot simply shows us four numbers, one for each category. We usu
 
 ![cumulative function](https://rafalab.github.io/dsbook/book_files/figure-html/ecdf-1.png)
 
-    + $F(b)-F(a)$ : the proportion of values between any two heights, say a and b
+* $F(b)-F(a)$ : the proportion of values between any two heights, say a and b
 
 > A final note: because CDFs can be defined mathematically the word empirical is added to make the distinction when data is used. We therefore use the term **empirical CDF (eCDF)**.
 
