@@ -1,0 +1,534 @@
+---
+title: "Chap 11 Data visualization principles"
+output: html_notebook
+---
+
+# **11.0 Intro**
+
+Karl Broman - ["Creating Effective Figures and Tables"](https://www.biostat.wisc.edu/~kbroman/presentations/graphs2017.pdf)
+
+```{r echo=TRUE}
+library(tidyverse)
+library(dslabs)
+library(gridExtra)
+```
+
+***
+
+# **11.1 Encoding data using visual cues**
+
+> Pie chart는 정보해석이 어렵다. 
+> 단순 table로 표현하는 편이 이보다 낫다. 
+> 사람은 "linear measurement"에 훨씬 능숙하므로, "길이" 혹은 "위치"를 단서로 이용해야 한다. 
+> 바람직한 표현 법 : 밝기, 색상 < 각도, 면적 < 길이, 위치 
+
+***
+
+# **11.2 Know when to include 0**
+
+> Bar plot은 길이가 수량에 비례하므로, 0에서 Bar가 시작되지 않는 것은 일종의 조작
+> 길이 비교가 아닌 "위치"를 비교하는 경우 0을 포함할 필요가 없다. 
+
+ex) 길이 비교 : 지지율, 강수량 ... 
+ex) 위치 비교 : life expectancy ...
+
+> 위치 비교의 경우에는 오히려 0을 포함하는 경우 비교가 어려워 진다. 
+> (log transformation도 좋은 선택일 듯)
+
+*** 
+
+# **11.3 Do not distort quantities**
+
+> 수량을 면적에 빗대어 visualization을 할 때에는, 수량을 linear하게 mapping하는지 반드시 확인해야 한다.
+
+ex) 수량 -> 원형 plot의 반지름에 대응시킬 때와 면적에 대응시킬 때는 전혀 다른 visualization을 유발 (ggplot은 면적에 대응)
+
+***
+
+# **11.4 Order categories by a meaningful value**
+
+> Data visulization에서 절대 alphabetical order를 아무 이유없이 사용하지 말자! 
+> 정량적 ordering을 이용 : `reorder`
+
+```{r echo=TRUE}
+data(murders)
+murders %>% mutate(murder_rate = total / population * 100000) %>%
+  mutate(state = reorder(state,murder_rate)) %>% #df 자체의 순서 변화는 없음. (순서는 어떤식으로 정보가 저장?) 
+  ggplot(aes(state, murder_rate)) +
+  geom_bar(stat="identity") +
+  coord_flip() +
+  theme(axis.text.y = element_text(size = 6)) +
+  xlab("")
+```
+
+
+***
+
+# **11.5 Show the data ** 
+
+> Bar plot은 data를 숨긴 표현 방식이다. 
+> Show the data! 
+
+```{r echo=TRUE}
+heights %>%
+  ggplot(aes(sex,height)) + 
+  geom_point()
+```
+
+> 한계 : 점의 중첩, 모든 데이터가 표현되지 못함. 
+> 개선 
+> 1. jitter 추가 : 각 점의 임의적인 이동 (넓게 퍼트림)
+> 2. alpha belnding : 투명도를 이용하여 점의 밀도를 표현
+
+```{r echo=TRUE}
+heights %>%
+  ggplot(aes(sex, height)) +
+  geom_jitter(width = 0.1, alpha = 0.2)
+```
+
+
+***
+
+# ** 11.6 Ease comparisons**
+
+## 11.6.1 Use common axes
+
+> 데이터가 너무 많으면 data 그 자체보다는 frequency를 표현하는 편이 나음
+
+```{r echo=TRUE}
+heights %>% group_by(sex) %>%
+  ggplot(aes(height, y= ..density..)) +
+  geom_histogram(binwidth = 1, col = "black") +
+  facet_grid(.~sex)
+```
+
+> 축을 동일하게 맞춰주어야 비교가 용이 (자동으로 맞춰지는 듯?)
+> `xlim` 이용 
+
+## 11.6.2 Align plots vertically to see horizontal change and horizontally to see vertical change
+
+```{r echo=TRUE}
+heights %>%
+  ggplot(aes(height, ..density..)) +
+  geom_histogram(binwidth = 1, col = "black") + 
+  facet_grid(sex~.)
+```
+
+> 분포의 이동을 관찰할 수 있음. 
+> 분포와 raw data를 함께 관찰하기 위하여 두 표현을 합치는 것도 좋음
+
+```{r echo=TRUE}
+heights %>%
+  ggplot(aes(sex,height)) + 
+  geom_boxplot(coef=3) + 
+  geom_jitter(width=0.1,alpha=0.2)+
+  ylab("Height in inches")
+```
+
+## 11.6.3 Consider transformations
+
+> 적절한 data transformation은 data 비교를 확연하게 만들어 줌. 
+> data transformation 없이 정보를 얻기 어려운 경우도 있음 
+> `logit` : logistic transformation ; fold change 표기에 용이
+> `sqrt` : square root transformation ; data count에 용이 
+
+## 11.6.4 Visual cues to compared should be adjacent
+
+> 비교 대상은 나란히 배치한다! 
+
+## 11.6.5 Use color 
+
+> 색상을 적절히 이용하면 data 비교가 더 쉬워진다.
+
+***
+
+# **11.7 Think of the color bline**
+
+> ggplot2의 기본 pallet는 색맹 group에게 적합하지 않다. 
+> [Reference](https://bconnelly.net/posts/creating_colorblind-friendly_figures/)
+
+```{r echo=TRUE}
+# color blind friendly color pallet
+color_blind_friendly_cols <- 
+  c("#999999", "#E69F00", "#56B4E9", "#009E73", 
+    "#F0E442", "#0072B2", "#D55E00", "#CC79A7")
+```
+
+***
+
+# **11.8 Plots for two variables**
+
+> 일반적으로 변수 비교에는 scatterplot이 최적 
+> 예외 : Slope charts, Bland-Altman plot
+
+## 11.8.1 Slope charts
+
+> 동일한 유형의 변수를 적은 수에서 비교하는 경우 
+
+```{r echo=TRUE}
+west <- c("Western Europe","Northern Europe","Southern Europe",
+          "Northern America","Australia and New Zealand")
+
+dat <- gapminder %>%
+  filter(year%in% c(2010, 2015) & region %in% west &
+           !is.na(life_expectancy) & population > 10^7)
+
+dat %>%
+  mutate(location = ifelse(year == 2010, 1, 2), 
+         location = ifelse(year == 2015 & 
+                             country %in% c("United Kingdom","Portugal"),
+                           location+0.22, location),
+         hjust = ifelse(year == 2010, 1, 0)) %>%
+  mutate(year = as.factor(year)) %>%
+  ggplot(aes(year, life_expectancy, group = country)) +
+  geom_line(aes(color = country), show.legend = FALSE) +
+  geom_text(aes(x = location, label = country, hjust = hjust), 
+            show.legend = FALSE) +
+  xlab("") + 
+  ylab("Life Expectancy")
+```
+
+> 기울기를 중심으로 변경사항을 신속하게 파악할 수 있음. 
+> 점의 수가 많은경우 비교가 어려운 방법 
+
+## 11.8.2 Bland-Altman plot(=MA plot = Tukey mean-difference plot)
+
+```{r echo=TRUE}
+library(ggrepel)
+dat %>% 
+   mutate(year = paste0("life_expectancy_", year)) %>%
+   select(country, year, life_expectancy) %>% spread(year, life_expectancy) %>% 
+  mutate(average = (life_expectancy_2015 + life_expectancy_2010)/2,
+         difference = life_expectancy_2015 - life_expectancy_2010) %>%
+  ggplot(aes(average, difference, label = country)) + 
+  geom_point() +
+  geom_text_repel() +
+  geom_abline(lty = 2) +
+  xlab("Average of 2010 and 2015") + 
+  ylab("Difference between 2015 and 2010")
+```
+
+***
+
+#**11.9 Encoding a third variable**
+
+> categorical variables의 encoding : 색, 모양 등으로 encoding
+> `shape` : R에서는 총 25가지의 dot 모양을 제공
+
+> continuous variable의 경우 색의 강도로 encoding
+> `RColorBrewer`
+
+* intensity
+```{r echo=TRUE}
+library(RColorBrewer)
+display.brewer.all(type="seq") #sequence --> intensity
+```
+
+* divergence
+```{r echo=TRUE}
+display.brewer.all(type="div")
+```
+
+***
+
+# **11.10 Avoid pseudo-three-dimensional plots**
+
+> 3차원 도형의 시각적 분석은 직관적이지 않다. 
+> 특히 3차원으로 도형을 그릴 경우 교차점을 한눈에 찾기 어렵다. 
+> data 자체의 dimension은 2D인데, 표현을 3D로 한 pseudo-three-dimensional plot은 무의미하다. 
+
+***
+
+# **11.11 Avoid too many significant digits(유효숫자)
+
+> R과 같은 통계 tool은 유효숫자를 기본적으로 많이 반환
+> 조절 : `signif`, `round`, `option(digits=#)`
+
+> 비교하는 값을 row가 아닌 column에 비교 (?아직 와닿지 않음)
+
+***
+
+# **11.12 Know your audience**
+
+> graph의 목적 : 1)our own exploratory data analysis, 2) to convey a message to experts, 3) to help tell a story to general audience 
+
+ex) log transformation이 익숙하지 않은 청자가 예측될 경우 : log 값이 아닌, scale만 log인 원값을 사용하는 방안이 적합
+
+***
+
+# **11.13 Exercise**
+
+```{r}
+library(dslabs)
+data("us_contagious_diseases")
+```
+
+1. Pie charts are appropriate:
+
+A. When we want to display percentages.
+
+B. When ggplot2 is not available.
+
+C. When I am in a bakery.
+
+**D. Never. Barplots and tables are always better.**
+
+
+
+2. What is the problem with the plot below: 
+
+A. The values are wrong. The final vote was 306 to 232.
+
+**B. The axis does not start at 0. Judging by the length, it appears Trump received 3 times as many votes when, in fact, it was about 30% more.**
+
+C. The colors should be the same.
+
+D. Percentages should be shown as a pie chart.
+
+
+
+3. Take a look at the following two plots. They show the same information: 1928 rates of measles across the 50 states.
+
+Which plot is easier to read if you are interested in determining which are the best and worst states in terms of rates, and why?
+
+A. They provide the same information, so they are both equally as good.
+
+B. The plot on the right is better because it orders the states alphabetically.
+
+**C. The plot on the right is better because alphabetical order has nothing to do with the disease and by ordering according to actual rate, we quickly see the states with most and least rates.**
+
+D. Both plots should be a pie chart.
+
+
+
+4. To make the plot on the left, we have to reorder the levels of the states’ variables.
+
+```{r echo=TRUE}
+dat <- us_contagious_diseases %>%
+  filter(year == 1967 & disease == "Measles" & !is.na(population)) %>%
+  mutate(rate = count/population * 10000 * 52 / weeks_reporting)
+```
+
+Note what happens when we make a barplot:
+
+```{r echo=TRUE}
+dat %>% ggplot(aes(state, rate)) +
+  geom_bar(stat="identity") +
+  coord_flip()
+```
+
+Define these objects:
+
+```{r echo=TRUE}
+state <- dat$state
+rate <- dat$count/dat$population*10000*52/dat$weeks_reporting
+```
+
+Redefine the `state` object so that the levels are re-ordered. Print the new object state and its levels so you can see that the vector is not re-ordered by the levels.
+
+```{r echo=TRUE}
+state <- reorder(state, rate)
+state
+```
+
+```{r}
+levels(state)
+```
+
+
+5. Now with one line of code, define the dat table as done above, but change the use mutate to create a rate variable and reorder the state variable so that the levels are reordered by this variable. Then make a barplot using the code above, but for this new `dat`.
+
+```{r echo=TRUE}
+dat %>%
+  mutate (state=reorder(state,rate)) %>%
+  ggplot(aes(state,rate)) +
+  geom_bar(stat="identity") +
+  coord_flip()
+```
+
+
+6. Say we are interested in comparing gun homicide rates across regions of the US. We see this plot:
+
+```{r echo=TRUE}
+library(dslabs)
+data("murders")
+murders %>% mutate(rate = total/population*100000) %>%
+  group_by(region) %>%
+  summarize(avg = mean(rate)) %>%
+  mutate(region = factor(region)) %>%
+  ggplot(aes(region, avg)) +
+  geom_bar(stat="identity") +
+  ylab("Murder Rate Average")
+```
+
+and decide to move to a state in the western region. What is the main problem with this interpretation?
+
+A. The categories are ordered alphabetically.
+
+B. The graph does not show standard errors.
+
+**C. It does not show all the data. We do not see the variability within a region and it’s possible that the safest states are not in the West.**
+
+D. The Northeast has the lowest average.
+
+
+
+7. Make a boxplot of the murder rates defined as
+
+```{r}
+data(murders)
+murders <- murders %>% mutate(rate = total/population*100000)
+```
+by region, showing all the points and ordering the regions by their median rate.
+
+```{r echo=TRUE}
+murders %>% 
+  group_by(region) %>%
+  ggplot(aes(reorder(region,rate,median), rate)) + 
+  geom_boxplot() +
+  geom_point()
+# mutate로 먼저 region을 정렬하는 방향은 안됨? 
+```
+
+
+
+8. The plots below show three continuous variables.
+
+The line $x=2$ appears to separate the points. But it is actually not the case, which we can see by plotting the data in a couple of two dimensional points.
+
+Why is this happening?
+
+**A. Humans are not good at reading pseudo-3D plots.**
+
+B. There must be an error in the code.
+
+C. The colors confuse us.
+
+D. Scatterplots should not be used to compare two variables when we have access to 3.
+
+
+
+9~12 -> 뒷부분에서 다시 
+
+
+***
+
+# **11.14 Case study : impact of vaccines on battling infectious diseases
+
+```{r}
+library(tidyverse)
+library(dslabs)
+data(us_contagious_diseases)
+str(us_contagious_diseases)
+```
+
+> analysis of measles
+
+```{r}
+the_disease <- "Measles"
+dat <- us_contagious_diseases %>%
+  filter(!state%in%c("Hawaii","Alaska") & disease == the_disease) %>%
+  mutate(rate = count / population * 10000 * 52 / weeks_reporting) %>% 
+  mutate(state = reorder(state, rate)) 
+```
+
+```{r echo=TRUE}
+dat %>% filter(state == "California" & !is.na(rate)) %>%
+  ggplot(aes(year, rate)) +
+  geom_line() + 
+  ylab("Cases per 10,000")  + 
+  geom_vline(xintercept=1963, col = "blue")
+# blue line for year of vaccination 
+```
+
+> Heatmap을 이용
+
+```{r echo=TRUE}
+dat %>% ggplot(aes(year, state, fill = rate)) +
+  geom_tile(color = "grey50") +
+  scale_x_continuous(expand=c(0,0)) +
+  scale_fill_gradientn(colors = RColorBrewer::brewer.pal(9, "Reds"), trans = "sqrt") +
+  geom_vline(xintercept=1963, col = "blue") +
+  theme_minimal() +  theme(panel.grid = element_blank()) +
+  ggtitle(the_disease) + 
+  ylab("") + 
+  xlab("")
+```
+
+```{r echo=TRUE}
+avg <- us_contagious_diseases %>%
+  filter(disease==the_disease) %>% group_by(year) %>%
+  summarize(us_rate = sum(count, na.rm=TRUE)/sum(population, na.rm=TRUE)*10000)
+
+dat %>% 
+  filter(!is.na(rate)) %>%
+    ggplot() +
+  geom_line(aes(year, rate, group = state),  color = "grey50", 
+            show.legend = FALSE, alpha = 0.2, size = 1) +
+  geom_line(mapping = aes(year, us_rate),  data = avg, size = 1, color = "black") +
+  scale_y_continuous(trans = "sqrt", breaks = c(5, 25, 125, 300)) + 
+  ggtitle("Cases per 10,000 by state") + 
+  xlab("") + 
+  ylab("") +
+  geom_text(data = data.frame(x = 1955, y = 50), 
+            mapping = aes(x, y, label="US average"), 
+            color="black") + 
+  geom_vline(xintercept=1963, col = "blue") 
+```
+
+
+
+*** 
+
+# **11.15 Exercise**
+
+1. eproduce the image plot we previously made but for smallpox. For this plot, do not include years in which cases were not reported in 10 or more weeks.
+
+```{r echo=TRUE}
+dat <- us_contagious_diseases %>% 
+  filter(disease == "Smallpox" & !is.na(population)) %>%
+  mutate(rate = count / population * 10000 * 52 / weeks_reporting)
+
+dat %>% ggplot(aes(year, state, fill = rate)) +
+  geom_tile(color = "grey50") +
+  scale_x_continuous(expand=c(0,0)) +
+  scale_fill_gradientn(colors = RColorBrewer::brewer.pal(9, "Reds"), trans = "sqrt") +
+  theme_minimal() +  theme(panel.grid = element_blank())
+```
+
+
+2. Now reproduce the time series plot we previously made, but this time following the instructions of the previous question for smallpox.
+
+```{r echo=TRUE}
+dat %>% filter(!is.na(rate)) %>%
+  group_by(state) %>%
+  ggplot(aes(year, rate)) +
+  geom_line(aes(color = state), show.legend = FALSE)
+```
+
+
+3. For the state of California, make a time series plot showing rates for all diseases. Include only years with 10 or more weeks reporting. Use a different color for each disease.
+
+```{r echo=TRUE}
+dat <- us_contagious_diseases %>%
+  filter(state == 'California' & !is.na(population)) %>%
+  mutate(rate = count / population * 10000 * 52 / weeks_reporting)
+
+dat %>%
+  filter(!(weeks_reporting < 9)) %>%
+  group_by(disease) %>%
+  ggplot(aes(year, rate, color = disease)) +
+  geom_line()
+```
+
+
+
+4. Now do the same for the rates for the US. Hint: compute the US rate by using summarize: the total divided by total population.
+
+```{r echo=TRUE}
+us_contagious_diseases %>%
+  group_by(disease, year) %>%
+  summarize(total_rate = sum(count, na.rm = TRUE) / sum(population, na.rm = TRUE) * 10000) %>%
+  ggplot(aes(year, total_rate, color = disease)) +
+  geom_line()
+```
