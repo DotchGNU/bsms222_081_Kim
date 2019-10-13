@@ -1,3 +1,9 @@
+---
+Title: "DS-CH3 R Basics"
+output : github_document
+categories : DataScience BSMS222 Rprogramming
+---
+
 Chap3\_R\_Basics
 ================
 
