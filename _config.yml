@@ -18,9 +18,9 @@ minimal_mistakes_skin    : "aqua" # "air", "aqua", "contrast", "dark", "dirt", "
 locale                   : "en-US"
 title                    : "DataScience_with_R"
 title_separator          : "-"
-subtitle                 : "KU-BSMS222 prctice note from GWK"
+subtitle                 : "KU-BSMS222 practice note from GWK"
 name                     : "DotchGNU"
-description              : "KU-BSMS222 prctice note from GWK"
+description              : "KU-BSMS222 practice note from GWK"
 url                      : "https://dotchgnu.github.io"
 baseurl                  : "/bsms222_081_kim"
 repository               : # GitHub username/repo-name e.g. "mmistakes/minimal-mistakes"
@@ -107,9 +107,9 @@ analytics:
 
 # Site Author
 author:
-  name             : "Your Name"
+  name             : "DotchGNU"
   avatar           : # path of avatar image, e.g. "/assets/images/bio-photo.jpg"
-  bio              : "I am an **amazing** person."
+  bio              : "Geun-woo D. Kim"
   location         : "Somewhere"
   email            :
   links:
