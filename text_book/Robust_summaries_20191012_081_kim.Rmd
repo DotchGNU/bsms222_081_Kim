@@ -16,7 +16,7 @@ library(dslabs)
 
 * Outlier : 측정 오류, 측정자의 오류 등에 의하여 Data를 다루는 데에 있어서 자주 등장 
 
-  *How do we distinguish an outlier from measurements that were too big or too small simply due to expected variability?* This is not always an easy question to answer, but we try to provide some guidance. Let’s begin with a simple case.
+  **How do we distinguish an outlier from measurements that were too big or too small simply due to expected variability?** This is not always an easy question to answer, but we try to provide some guidance. Let’s begin with a simple case.
   
   Suppose a colleague is charged with collecting demography(인구학) data for a group of males. The data report height in feet and are stored in the object:
   
