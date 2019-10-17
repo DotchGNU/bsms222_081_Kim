@@ -670,6 +670,8 @@ miR_DFC_DE
 
 
 ```{r}
+library(dplyr)
+library(tidyverse)
 miR_DFC_DE<-miR_DFC_DE %>% mutate(age_specific=case_when((Gender_specific_by_volume!="Gender-neutral" & age_group == "Adult")~"adult_specific",
                                               (Gender_specific_by_volume!="Gender-neutral" & age_group == "Youth")~"youth_specific",
                                               TRUE ~ "Gender-neutral"))
