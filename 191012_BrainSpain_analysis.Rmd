@@ -1,0 +1,863 @@
+---
+title: BrainSpan dataset"
+output: html_notebook
+---
+
+*** 
+
+# 1. Assignment information
+
+## 1.1 Background 
+
+* Professor's webpage [link](https://joonan30.github.io/bsms222_123_an/)
+
+* BSMS222 assignment [link](https://htmlpreview.github.io/?https://github.com/joonan30/bsms222_123_an/blob/master/assignment1.nb.html)
+
+* Dataset : BrainSpan dataset 
+
+* Sumission format : R notebook html named "assignment1_081_Kim"
+
+* Plotting rule : <= 2 plots, Multi-panel plots(`facet_wrap` or `cowplot`) are allowed
+
+* Deadline : 17th Thu Oct, 10PM
+  
+* Evaludation policy 
+
+  1. **Accuracy** : How well you describe the dataset to your question in the R notebook? 
+  
+      - Question에 집중하라 
+  
+  2. **Flowing Data** : Whether/How many times you use `tidyverse` functions for data munging? Whether the code is briefly and efficiently written for your task (e.g. `%>%`)? 
+  
+      - `tidyverse`의 ecosystem을 이해하며 데이터 변환을 효율적인 script로 구현하라.
+    
+      - [Tidy data there's no need to start from scratch.](http://vita.had.co.nz/papers/tidy-data.pdf) - from wiki 
+    
+      - 배운 것을 써먹어라. 
+    
+  3. **Storytelling with Data** : Whether you fully utilize the dataset for your question? Whether you understand the aim and methods of the dataset?
+  
+  4. **Readability of your plot** : How much information you summarize into your plot?
+      - 최대한 풀어서 써라. 
+  
+  5. **Right visual format** : Whether you properly use color, scale, and data type for your data visualization. 
+
+
+
+## 1.2 My question and Strategy 
+
+### **Q : 뇌의 성별 결정에 miRNA에 의한 post-translational regulation이 어떠한 영향을 끼치는가?**
+
+  1. 성별에 따라 profile이 다른 miRNA의 indentification 
+  
+```{markdown echo=TRUE}
+    step 1 ) MAplot -> volume cut-off setting
+    step 2 ) Volcano plot
+    step 3 ) select putative miRNA that determine the gender of the brain (named "bg-miRNA" => female : "bgF-miR", male : "bgM-miR")
+```
+
+  - Q) sexual identity와 brain gender identity는 항상 일치할 것인가?
+    
+     + annotation : biological sex (stands for sexual identity)
+  
+  2. 생애 주기 내 성별에 따른 bgF-miR과 bgM-miR의 profile 
+    
+  - strategy 1 : using scatter plot 
+    
+```{markdown}
+x-axis : Age [year]
+y-axis : Fold enrichment [log2(F/M)] 
+          - positive : Female enriched 
+          - negative : Male enriched 
+dot color : bgF-miR vs bgM-miR 
+```
+
+  - strategy 2 : using HeatMap << I think it's better 
+
+```{markdown}
+x-axis : Age [year]
+y-axis : bg-miR  >> clustering as week and strong 
+color : Fold enrichment [log2(F/M)]
+```
+
+  3. 성별 결정에 critical하다고 판단되는 시기를 mRNA profile을 통해 추정
+
+  4. critical time point를 miRNA profile과 matching
+
+  5. miRNA target prediction을 통하여 sex determination에 끼치는 영향 평가
+
+
+***
+
+# 2. Data set information 
+  
+## 2.1 Description from assignment page 
+  
+  - The development of the prefrontal cortex (PFC) is an immensely complex process. It begins as a simple neural tube that derives from the embryonic ectoderm and gradually develops into mature organization through immensely complicated and strictly regulated molecular and cellular processes. Recent advances in genome sequencing enables profiling gene expression across human tissues and developmental stages. Here we use the RNA-seq transcriptomic dataset from the BrainSpan atlas, a foundational resource for studying transcriptional mechanisms involved in human brain development. With the subset of the **human dorsolateral prefrontal cortex**, we will explore how gene expression changes from early fetal to late adulthood.
+
+  - There are two papers on the dataset ([Kang et al. 2010](https://www.ncbi.nlm.nih.gov/pubmed/22031440), [Miller et al. 2014](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4105188/)). Please find background information - experimental design, techniques (RNA-seq), and findings for developing brain transcriptome.
+
+  - In the dataset, you will find three data frames.
+
+      + e: RNA-seq expression
+      + g: gene information 
+      + s: sample information
+
+    For further information, please find the [PDF link](file:///D:/Download_chorme/Transcriptome_Profiling%20(1).pdf).
+
+## 2.2 miRNA data information 
+
+  1. RNA extraction method : QIAgen RNeasy PLUS kit method (non-phenolic RLT lysis)
+  
+      - there might be loss of miRNA : RNeasy kit only guarantees >200ntd... I don't know why they use this kit... 
+    
+  2. Library preparation : TruSeq Small RNA sample Kit (Illumina, start with 1ug of total RNA)
+  
+  3. Analysis
+  
+      1) Preprocess to make trimmed reads between 16~36ntd
+      2) 1st Mapping : Mapping to miRBase DB (mature + precursor/hairpin)
+          - using Bowtie(version 0.12.7) _argument: '-best', '-strata', maximum 2-base mismatch
+          - reference as 17nt seed region of miRBase DB
+      3) 2nd Mapping : use unmapped read from 2) 
+          - piRNA : RNAdb(version2, Pang et al., 2005)
+          - eRNA(enhancer RNA) : sequence from genomic coordinates defined in (Prabhakar et al., 2006)
+          - tRNA : GtRNAdb(Chan, and Lowe et al., 2009)
+          - mRNA : GENCODE(version 10, Harrow et al., 2006)
+          - entries : RFam database (version 10.1, Gardner et al., 2009)
+      4) 3rd Mapping : use unmapped read from 3) 
+          - genome (hg19)
+
+  4. Normalization : represented by RPM value (normalized by the total number of mapped reads over all RNA species) >> 확인해보니 RPM이 아닌 raw count로 reporting되어 있음 
+    
+      - in 'README' sheet : "Raw RNA-seq read-count data for microRNAs are contained for the isolated small RNA samples from the indicated structures and specimens."
+
+
+
+
+***
+
+
+
+# 3. miRNA analysis 
+
+**Main Question : 성별에 따라 profile이 다른 miRNA의 indentification **
+
+## 3.1 miRNA data download 
+
+  * get miRNA xls files from WebSite directly 
+  
+```
+[Terminal]
+wget http://download.alleninstitute.org/brainspan/MicroRNA/MicroRNA.xls
+```
+
+```{r}
+#install.packages('readxl')
+library(readxl)
+library(tidyverse)
+miRDB <- read_excel("MicroRNA.xls",
+                    sheet="miRNA_rawCount",
+                    col_names = TRUE)
+#colnames(miRDB)
+miRDB <- miRDB %>% rename("miRNA"="...1") #rename(NEW NAME = OLD NAME)
+miRDB %>% head()
+```
+
+  * It's not tidy >> but when converting RNA-seq data to tidy data, it's gonna messy.... isn't it? just try it! 
+
+## 3.2 miRNA dataset wrangling 
+
+### 3.2.1 Make it tidy! : wide to long
+
+* donor 이름에 "_"과 "-"가 규칙 없이 섞임. donor info sheet에는 "."로 이어져 있음 ==> 모두 "."로 바꾸고, structure information은 다른 row로 분리 
+
+```{r}
+c<-data_frame("sample"=c("H376_VIII_50-AMY-R","H376_VIII_51_CBC-R"))
+
+
+c %>% mutate(sample=gsub("-","_",sample)) %>% 
+  separate(sample, sep="_",, into=c("t1", "t2", "t3", "structure", "side")) %>%
+  mutate("age_group_BS"=t2) %>%
+  unite(col="donor_name", t1, t2, t3, sep=".")
+  
+#  mutate("structure"=do.call('rbind',strsplit(sample,split="_"))[,4],
+#         "new_name"=paste(do.call('rbind',strsplit(sample,split="_"))[,-4][,-5], collapse="."))
+```
+
+* wide to long 
+
+```{r}
+library(tidyr)
+## wide -> long by `gather(key="정리 후 변수의 col 이름", value="정리 후 값의 col 이름",  정리할 행 규칙)` 
+miRDB <- miRDB %>% gather(key="donor_name", value="counts", starts_with('H376'),factor_key=FALSE)
+#miRDB
+miRDB %>% summarize("#_of_donor_and_structure"=n_distinct(donor_name))
+```
+
+```{r}
+## 변수 정리 : 필요한 data를 column으로 나누기  0
+miRDB<- miRDB %>% mutate(donor_name=gsub("-","_",donor_name)) %>%   #donor name을 하나의 규칙으로 정리
+          separate(donor_name, sep="_", into=c("t1", "t2", "t3", "structure", "side")) %>%
+          mutate("age_group_BS"=t2) %>%
+          unite(col="donor_name", t1, t2, t3, sep=".") %>%
+          mutate(age_group=case_when(age_group_BS %in% c("X", "XI") ~ "Adult",
+                              age_group_BS %in% c("VI", "VII", "VIII", "IX") ~ "Youth",
+                              TRUE ~ "Fetus"))
+miRDB %>% summarize("distinct_#_of_donor"=n_distinct(donor_name))
+```
+
+### 3.2.2 Collecting gender information 
+
+  * miRNA dataset에는 donor description이 없어 RNA-seq dataset의 `columns_metadata'를 이용하여 정보수집 
+  
+```
+[Terminal]
+wget https://www.brainspan.org/api/v2/well_known_file_download/267666525
+>>filename : 267666525
+file 267666525
+>>267666525: Zip archive data, at least v2.0 to extract
+unzip 267666525
+```
+
+```{r}
+donor_info <- read_csv("columns_metadata.csv") %>% 
+              select(donor_name, age, gender) %>% 
+              unique() 
+donor_info
+```
+
+* practice 
+
+```{r}
+expdf <- tibble(donor_name=c("H376_IIA_51", "H376_IIA_50"), value=c(1,2))
+merge(expdf, donor_info, all.y = T)
+count(expdf)
+```
+
+* application
+
+```{r}
+miRDB <- merge(miRDB, donor_info, by='donor_name' ,all.x=T)
+miRDB %>% group_by(gender) %>% summarize("Number_of_donor"=n_distinct(donor_name))
+```
+
+* 한 sample에서 성별 정보가 누락된 것인가? 
+
+```{r}
+miRDB %>% filter(gender %in% NA) %>% distinct(donor_name)
+```
+
+* 실제로 직접 xls 파일을 확인해보니 description 정보 누락
+* [BrainSpan](https://help.brain-map.org/download/attachments/3506181/Human_Brain_Seq_Stages.pdf?version=1&modificationDate=1433436980032&api=v2)에서 직접 확인 >> age = 6 pm, gender = FEMALE
+
+```{r}
+# 결측값 채우는 방식으로 누락된 정보 채우기 
+miRDB <- miRDB %>% mutate(gender = replace_na(gender, "F"), age = replace_na(age, "6 pm"))
+miRDB %>% group_by(gender) %>% summarize("Number_of_donor"=n_distinct(donor_name))
+```
+
+```{r}
+miRDB %>% group_by(gender,age_group) %>%  summarize("Number_of_donor"=n_distinct(donor_name))
+```
+
+* 아쉽게도 Fetus의 miRNA data가 없음. 2차 성징 전후로 바뀌는 miRNA를 보아야 할 것. 
+
+```{r}
+miRDB %>% group_by(gender,age_group) %>% filter(structure == "DFC") %>% summarize("Number_of_donor"=n_distinct(donor_name))
+```
+
+```{r}
+miRDB %>% group_by(structure, gender,age_group) %>% summarize("Number_of_donor"=n_distinct(donor_name))
+```
+
+### 3.2.3 Read normalization 
+
+* practice 
+
+```{r}
+#group and calculate each group 
+exdf <- data_frame(donor = c("A", "A", "A", "B", "B", "B", "C", "C", "C"),
+                   miR = c("miR1", "miR2", "miR3","miR1", "miR2", "miR3","miR1", "miR2", "miR3"), 
+                   read = c(2,4,6,3,6,9,4,8,12)) 
+exdf %>% group_by(donor) %>%
+          mutate(total_read = sum(read), RPM = read / sum(read) * 10^6)
+```
+
+* application
+
+  + pseudocount : Fold change 계산 시 결측치에 의한 누락을 방지하기 위하여 raw count에 1을 더함 
+  
+```{r}
+miRDB <- miRDB %>% 
+    group_by(donor_name) %>%
+    mutate(pseudocount = counts + 1) %>% 
+    mutate(RPM = pseudocount / sum(pseudocount) * 10^6) %>%  
+    mutate(log2RPM = log2(RPM))
+miRDB %>% head()
+```
+
+> long form의 data에서 쉽게 연산 변환이 가능 
+
+### 3.2.4 DFC region만 분리하여 분석 진행할 dataset 만들기 
+
+```{r}
+miRDB_DFC <- miRDB %>% filter(structure == "DFC") 
+miRDB_DFC %>% group_by(gender, age_group) %>% summarize("Number_of_donor" = n_distinct(donor_name))
+```
+
+> 통계적 유의성을 고려하기에 n수가 부족하지만, human sample임에 의의를 두고 분석 진행 
+
+## 3.3 Differential expression analysis 
+
+### 3.3.1 성인에서만 성별에 따라 유의하게 차이가 있는 miRNA 찾기 
+
+#### 3.3.1.1 Fold change 계산하기 -> Fold_enrichment, sd of Fold_enrichment
+
+* miRNA의 확률분포는 EVD 혹은 nagetive binomeal distribution을 따른다고 알려져 있으나, 본 실습에서는 단순화하여 normal distribution을 따른다 가정하고 실행하였다.
+
+* Practice
+
+* 아래와 같이 구할 수야 있기는 한데, 이러면  tidy data로 바꾼 이유가 있을까? 
+
+1) RPM으로 scattering한 후 log scale로 바꾼 경우 
+
+```{r}
+library(ggrepel)
+
+miR_DFC_DE<- miRDB_DFC %>% filter(age_group == "Adult") %>% 
+  group_by(gender, miRNA) %>% 
+  summarize("average"=mean(RPM)) %>%
+  spread(key="gender", value="average") %>%
+  mutate("Fold_Enrichment" = F/M, "Average_expression"= F+M/2) 
+miR_DFC_DE %>% ggplot(aes(Average_expression, Fold_Enrichment, na.rm=TRUE)) + 
+  geom_point() +
+  scale_x_continuous(trans = "log2") +
+  scale_y_continuous(trans = "log2") + 
+  geom_text_repel(aes(label=ifelse(Average_expression > 4 & (Fold_Enrichment > 2 | Fold_Enrichment<0.5) , miRNA, "")))
+```
+
+2) 처음부터 log2RPM을 변수로 이용하여 scattering하는 경우 
+
+```{r}
+miR_DFC_DE_log <- miRDB_DFC %>% filter(age_group == "Adult") %>% 
+  group_by(gender, miRNA) %>% 
+  summarize("average"=mean(log2RPM)) %>%
+  spread(key="gender", value="average") %>%
+  mutate("Fold_Enrichment" = F-M, "Average_expression"= F+M/2) 
+
+miR_DFC_DE_log %>% ggplot(aes(Average_expression, Fold_Enrichment)) + 
+  geom_point() +
+  geom_text_repel(aes(label=ifelse((Average_expression > 4 & abs(Fold_Enrichment) > 1), miRNA, ""), )) +
+  xlab("Average Expression [log2RPM]") +
+  ylab("Fold Enrichment\n[log2, Female/Male]")
+```
+
+
+
+3) 보다 정밀하게 통계 분석을 위하여 : `log2(Fold_Enrichment)=log2(Female)-log2(Male)`라는 확률변수를 정의하고 함수를 통하여 Fold enrichment와 Average expression 계산 + t.test도 한번에 할 수 있도록 함수 구성 
+
+* t-test / f-test  practice 
+
+```{r}
+a<- c(7.694240, 7.721688)
+b<- c(7.971343, 7.178087)
+str(t.test(a,b)) 
+```
+
+````{r}
+t.test(a,b)[["p.value"]]
+```
+
+```{r}
+var.test(a,b)[["p.value"]]
+```
+
+* 함수화 
+
+```{r}
+temp <- miRDB_DFC %>% 
+  filter(miRNA %in% c("hsa-let-7c","hsa-let-7e-5p")) %>% 
+  select(miRNA, age_group, gender, RPM, age_group)
+temp %>% 
+  group_by(miRNA, gender, age_group) %>% 
+  summarize("average"=mean(RPM)) %>% 
+  spread(key="gender",value="average") %>% 
+  mutate("Fold_Enrichment"=F/M)
+temp <- temp %>% 
+          mutate(log2RPM=log2(RPM))
+temp
+```
+
+```{r}
+FE_AVG <- function(tidy_df){
+  ### input 
+  ### 1) tidy_df : tidy data format of miRNA expression file 
+  ### 2) fold_enrich_df 
+  fold_enrich_df = data.frame(miRNA=c(), FE_average=c(), FE_sd=c(), Exp_avg=c(), p_value=c())
+  
+  for(mir in unique(tidy_df$miRNA)){
+    female_log_RPMs <- tidy_df %>% filter(miRNA == mir & gender == "F") %>% .$log2RPM 
+    male_log_RPMs <- tidy_df %>% filter(miRNA == mir & gender == "M") %>% .$log2RPM
+    for(female_log_RPM in female_log_RPMs){
+      logFE <- female_log_RPM - male_log_RPMs #logFE = log2Fold Enrichment / 새로운 확률변수를 만들어서 FC의 std를 통계적으로 구하고자 함 
+    }
+    FEtemp <- data.frame(miRNA=mir, 
+                         FE_average=mean(logFE), # fold enrichment의 평균
+                         FE_sd=sd(logFE), # fold enrichmnet의 standard deviation --> scatter plot의 standard deviation 추가 
+                         Exp_avg = mean(c(female_log_RPMs,male_log_RPMs)), # expression의 평균
+                         Exp_sd = sd(c(female_log_RPMs,male_log_RPMs)), # expression의 sd 
+                         Q_score = -log10(t.test(female_log_RPMs,male_log_RPMs))) #significance (먼저 등분산 확인 후 분산검정 반영할 예정)
+    fold_enrich_df <- rbind(fold_enrich_df,FEtemp)
+  }
+  return (fold_enrich_df)
+}
+
+
+temp %>% filter(age_group=="Adult") %>% FE_AVG() 
+```
+
+
+```{r}
+miR_DFC_DE_each<- miRDB_DFC %>% filter(age_group=="Adult") %>% FE_AVG() 
+miR_DFC_DE_each %>% ggplot(aes(Exp_avg, FE_average)) + 
+  geom_point() +
+  geom_text_repel(aes(label=ifelse((Exp_avg > 4 & abs(FE_average) > 2), as.character(miRNA), ""), )) + 
+  xlab("Average Expression [log2RPM]") +
+  ylab("Fold Enrichment\n[log2, Female/Male]")
+```
+
+```{r}
+library(ggplot2)
+library(gridExtra)
+miR_DFC_DE_each <- miR_DFC_DE_each %>% mutate(Gender_specific_by_volume=case_when((Exp_avg > 4 & FE_average > 2)~"Female_enriched",
+                                                    (Exp_avg >4 & FE_average < -2)~"Male_enriched",
+                                                    TRUE~"Gender-neutral"))
+
+MA_miR<- miR_DFC_DE_each %>% group_by(Gender_specific_by_volume) %>%
+  ggplot(aes(Exp_avg, FE_average, color=Gender_specific_by_volume)) + 
+  geom_point() +
+  annotate("rect", alpha = 0.1, ymin=2,ymax=6,xmin=4,xmax=20,fill="brown1") +
+  annotate("rect", alpha = 0.05, ymin=-2,ymax=-6,xmin=4,xmax=20,fill="blue") +
+  scale_color_manual(values=c("darkred", "#C1CDCD", "darkblue")) +
+  xlab("Average Expression [log2RPM]") +
+  ylab("Fold Enrichment\n[log2, Female/Male]")+
+  geom_hline(yintercept = 2, colour="darkred", linetype="dashed", alpha=0.5) + 
+  geom_hline(yintercept = -2, colour="darkblue", linetype="dashed", alpha=0.5) + 
+  geom_vline(xintercept = 4, colour="darkgrey", linetype="dashed") +
+  coord_cartesian(xlim =c(-5, 15), ylim = c(-5, 5)) +
+  geom_text_repel(aes(label=ifelse((Exp_avg > 4 & FE_average > 2), as.character(miRNA), "")), nudge_x=-2.5, nudge_y=0.3) +
+  geom_text_repel(aes(label=ifelse((Exp_avg > 4 & FE_average < -2), as.character(miRNA), "")), nudge_x=2, nudge_y=-0.5) +
+  theme_bw() 
+MA_miR
+```
+
+```{r}
+miR_DFC_DE_each <- miR_DFC_DE_each %>% mutate(Gender_specific_by_volume=case_when((Exp_avg > 4 & FE_average > 2)~"Female_enriched",
+                                                    (Exp_avg >4 & FE_average < -2)~"Male_enriched",
+                                                    TRUE~"Gender-neutral"))
+
+miR_DFC_DE_each %>% 
+  ggplot(aes(FE_average, Q_score)) + 
+  geom_point() +
+#  annotate("rect", alpha = 0.1, ymin=2,ymax=6,xmin=4,xmax=20,fill="brown1") +
+#  annotate("rect", alpha = 0.05, ymin=-2,ymax=-6,xmin=4,xmax=20,fill="blue") +
+  scale_color_manual(values=c("darkred", "#C1CDCD", "darkblue")) +
+  xlab("Average Expression [log2RPM]") +
+  ylab("Fold Enrichment\n[log2, Female/Male]")+
+#  geom_hline(yintercept = 2, colour="darkred", linetype="dashed", alpha=0.5) + 
+#  geom_hline(yintercept = -2, colour="darkblue", linetype="dashed", alpha=0.5) + 
+#  geom_vline(xintercept = 4, colour="darkgrey", linetype="dashed") +
+   coord_cartesian(xlim =c(-5, 5), ylim = c(0, 2)) +
+#  geom_text_repel(aes(label=ifelse((Exp_avg > 4 & FE_average > 2), as.character(miRNA), "")), nudge_x=-2.5, nudge_y=0.3) +
+#  geom_text_repel(aes(label=ifelse((Exp_avg > 4 & FE_average < -2), as.character(miRNA), "")), nudge_x=2, nudge_y=-0.5) +
+  theme_bw() 
+```
+
+> 문제 발생 : Average Expression이 양수 쪽으로 치우치는 경향. 실제 경향인가? 혹은 artifact인가? 
+
+
+4) Fold Enrichment는 2)에서, Q-score는 3)에서 가져와서 ploting 
+
+* 3)의 경우가 outlier에 영향을 많이 받는 방식이라 추정 (실제로 다른 DEG program들은 해당 방식을 채용하지 않음)
+
+```{r}
+### miR_DFC_DE_log : log -> mean -> fold change 
+### miR_DFC_DE_each : log -> fold change -(new variable)-> mean/std (그 과정에서 RPM값으로 t-test를 별도로 진행하여 해당 값만 추출)
+miR_DFC_DE_final <- merge(miR_DFC_DE_log, miR_DFC_DE_each, by="miRNA", all=TRUE) %>% select(miRNA, F, M, Fold_Enrichment, Average_expression, Q_score)
+
+miR_DFC_DE_final <- miR_DFC_DE_final %>% mutate(Gender_specific_by_volume = case_when(
+                                                    (Average_expression > 4 & Fold_Enrichment > 1)~"Female_enriched",
+                                                    (Average_expression > 4 & Fold_Enrichment < -1)~"Male_enriched",
+                                                    TRUE~"Gender-neutral"))
+
+MA_miR <- miR_DFC_DE_final %>% 
+  group_by(Gender_specific_by_volume) %>%
+  ggplot(aes(Average_expression, Fold_Enrichment,color=Gender_specific_by_volume)) + 
+  geom_point() +
+  annotate("rect", alpha = 0.1, ymin=1,ymax=6,xmin=4,xmax=20,fill="brown1") +
+  annotate("rect", alpha = 0.05, ymin=-1,ymax=-6,xmin=4,xmax=20,fill="blue") +
+  scale_color_manual(values=c("darkred", "#C1CDCD", "darkblue")) +
+  xlab("Average Expression [log2RPM]") +
+  ylab("Fold Enrichment\n[log2, Female/Male]")+
+  geom_hline(yintercept = 1, colour="darkred", linetype="dashed", alpha=0.5) + 
+  geom_hline(yintercept = -1, colour="darkblue", linetype="dashed", alpha=0.5) + 
+  geom_vline(xintercept = 4, colour="darkgrey", linetype="dashed") +
+  coord_cartesian(xlim =c(-5, 15), ylim = c(-3, 3)) +
+  geom_text_repel(aes(label=ifelse((Average_expression > 4 & Fold_Enrichment > 1), as.character(miRNA), ""))) +
+  geom_text_repel(aes(label=ifelse((Average_expression > 4 & Fold_Enrichment < -1), as.character(miRNA), ""))) +
+  theme_bw() 
+```
+
+```{r}
+Vol_miR <- miR_DFC_DE_final %>% filter(Average_expression>4) %>%  
+  group_by(Gender_specific_by_volume) %>%
+  ggplot(aes(Fold_Enrichment, Q_score, color=Gender_specific_by_volume)) + 
+  geom_point() +
+  annotate("rect", alpha = 0.1, ymin=1,ymax=6,xmin=1,xmax=20,fill="brown1") +
+  annotate("rect", alpha = 0.05, ymin=1, ymax=6,xmin=-20,xmax=-1,fill="blue") +
+  scale_color_manual(values=c("darkred", "#C1CDCD", "darkblue")) +
+  xlab("Fold Enrichment\n[log2, Female/Male]") +
+  ylab("Significant [-log10(p-value)]")+
+  geom_hline(yintercept = 1, colour="darkgrey", linetype="dashed", alpha=0.5) + 
+  geom_vline(xintercept = -1, colour="darkblue", linetype="dashed", alpha=0.5) + 
+  geom_vline(xintercept = 1, colour="darkred", linetype="dashed") +
+  coord_cartesian(xlim =c(-3, 3), ylim = c(0, 1.5)) +
+  geom_text_repel(aes(label=ifelse(Gender_specific_by_volume=="Gender-neutral","",as.character(miRNA)))) +
+  theme_bw() 
+Vol_miR
+```
+
+> 등분산 가정 시 V-shape 잘 나옴 
+
+> 안타깝게도 n수가 부족하여 statistical significant까지 얻기는 어려울 것으로 예상 
+
+> miRNA expression에 있어서 normal distribution은 negative bionomeal distribution에 비하여 보수적인 검정이었을 것이므로 negative bionomeal distribution이나 poison distribution을 통한 statistical significant test도 의미가 있을 것. 
+
+> TCGA data LGG(Low Grade Glioma) data와 함께 비교해보기 (download 자동화 tool 익히기) [link](https://portal.gdc.cancer.gov/exploration?facetTab=cases&filters=%7B%22op%22%3A%22and%22%2C%22content%22%3A%5B%7B%22op%22%3A%22in%22%2C%22content%22%3A%7B%22field%22%3A%22cases.demographic.vital_status%22%2C%22value%22%3A%5B%22Alive%22%5D%7D%7D%2C%7B%22op%22%3A%22in%22%2C%22content%22%3A%7B%22field%22%3A%22cases.primary_site%22%2C%22value%22%3A%5B%22Brain%22%5D%7D%7D%2C%7B%22op%22%3A%22in%22%2C%22content%22%3A%7B%22field%22%3A%22cases.project.project_id%22%2C%22value%22%3A%5B%22TCGA-LGG%22%5D%7D%7D%5D%7D) --- keep
+
+```{r}
+miR_DFC_DE_final %>% arrange(desc(Average_expression)) %>% select(miRNA, Q_score, Fold_Enrichment, Average_expression, Gender_specific_by_volume)
+```
+
+### 3.3.2 Gender specific gene identification 
+
+
+*지금까지의 코드 정리 
+
+```{r}
+DFC_miR
+```
+
+```{r}
+tidy_to_DEG <- function(tidy_df){
+  ### input 
+  ### 1) tidy_df : tidy data format of miRNA expression file 
+  ### 2) fold_enrich_df 
+  ### output
+  ### 1) average of RPM
+  ### 2) fold enrichment of average
+  ### 3) Q-score 
+  ### 4) age group
+  
+  ### FEtemp = dataframe for calculating Fold_enrichment : method - log ration first (the same as DESeq2)
+  FEtemp <- tidy_df %>% 
+    group_by(miRNA, gender, age_group) %>% 
+    summarize("average"=mean(log2RPM)) %>%
+    spread(key="gender", value="average") %>%
+    mutate("Fold_Enrichment" = F-M, "Average_expression"= F+M/2) 
+  
+  ### Qtemp = dataframe for calculating Q-score
+  Qtemp = data.frame(miRNA=c(), Q_score=c())
+  
+  for(mir in unique(tidy_df$miRNA)){
+    female_log_RPMs <- tidy_df %>% filter(miRNA == mir & gender == "F") %>% .$log2RPM
+    male_log_RPMs <- tidy_df %>% filter(miRNA == mir & gender == "M") %>% .$log2RPM
+    temp <- data.frame(miRNA=mir, 
+                         Q_score = -log10(t.test(female_log_RPMs,male_log_RPMs, 
+                                          var.equal = ifelse(var.test(female_log_RPMs,male_log_RPMs)[["p.value"]]>0.05,
+                                                             TRUE, FALSE))[["p.value"]])) #significance
+    Qtemp <- rbind(Qtemp,temp)
+  }
+  
+  ### Merge by miRNA : FEtemp + Qtemp 
+  fold_enrich_df <- merge(FEtemp, Qtemp, by='miRNA', all=TRUE)
+  return (fold_enrich_df)
+}
+```
+
+```{r}
+miR_DFC_DE <- miRDB_DFC %>% 
+              tidy_to_DEG() %>% 
+              mutate(Gender_specific_by_volume = case_when((Average_expression > 4 & Fold_Enrichment > 1)~"Female_enriched",
+                                                            (Average_expression > 4 & Fold_Enrichment < -1)~"Male_enriched",
+                                                            TRUE~"Gender-neutral")) %>%
+              mutate(Gender_specific_by_sig = case_when((Q_score > 1.3 & Fold_Enrichment > 1)~"Female_enriched",
+                                                            (Q_score > 1.3 & Fold_Enrichment < -1)~"Male_enriched",
+                                                            TRUE~"Gender-neutral")) 
+
+## Make MA plot 
+miR_DFC_DE$age_group <- factor(miR_DFC_DE$age_group, levels=miRDFC_DE)MA_miR_age_group <- miR_DFC_DE %>%
+  group_by(Gender_specific_by_volume) %>%
+  ggplot(aes(Average_expression, Fold_Enrichment,color=Gender_specific_by_volume)) + 
+  geom_point() +
+  annotate("rect", alpha = 0.1, ymin=1,ymax=6,xmin=4,xmax=25,fill="brown1") +
+  annotate("rect", alpha = 0.05, ymin=-1,ymax=-6,xmin=4,xmax=25,fill="blue") +
+  scale_color_manual(values=c("darkred", "#C1CDCD", "darkblue")) +
+  xlab("Average Expression [log2RPM]") +
+  ylab("Fold Enrichment\n[log2, Female/Male]")+
+  geom_hline(yintercept = 1, colour="darkred", linetype="dashed", alpha=0.5) + 
+  geom_hline(yintercept = -1, colour="darkblue", linetype="dashed", alpha=0.5) + 
+  geom_vline(xintercept = 4, colour="darkgrey", linetype="dashed") +
+  coord_cartesian(xlim =c(-5, 20), ylim = c(-4, 4)) +
+  geom_text_repel(aes(label=ifelse((Average_expression > 4 & abs(Fold_Enrichment) > 1), as.character(miRNA), "")), size=2, force=8) +
+  theme_bw() +
+  theme(legend.position="none",
+        axis.title.x = element_text(size=8),
+        axis.title.y = element_text(size=8))+
+  facet_grid(age_group~.)
+
+
+## Make Volcano plot 
+VOL_miR_age_group <- miR_DFC_DE %>%
+  group_by(Gender_specific_by_volume) %>%
+  filter(Average_expression > 4) %>% # threshold of gene expression
+  ggplot(aes(Fold_Enrichment, Q_score, color=Gender_specific_by_volume)) + 
+  geom_point() +
+  annotate("rect", alpha = 0.1, ymin=1.3,ymax=6,xmin=1,xmax=25,fill="brown1") +
+  annotate("rect", alpha = 0.05, ymin=1.3,ymax=6,xmin=-1,xmax=-25,fill="blue") +
+  scale_color_manual(values=c("darkred", "#C1CDCD", "darkblue")) +
+  xlab("Fold Enrichment\n[log2, Female/Male]") +
+  ylab("Significant\n[-log10(p-value)]")+
+  geom_hline(yintercept = 1.3, colour="darkgrey", linetype="dashed", alpha=0.5) + 
+  geom_vline(xintercept = -1, colour="darkblue", linetype="dashed", alpha=0.5) + 
+  geom_vline(xintercept = 1, colour="darkred", linetype="dashed") +
+  coord_cartesian(xlim =c(-5, 5), ylim = c(0, 4)) +
+  geom_text_repel(aes(label=ifelse((Q_score > 1.3 & abs(Fold_Enrichment) > 1), as.character(miRNA), "")), size=2, force=8) +
+  theme_bw() +
+  theme(legend.position=c(0.8, 0.91), 
+        legend.title = element_blank(),
+        legend.background=element_blank(),
+        legend.text=element_text(size=7),
+        axis.title.x = element_text(size=8),
+        axis.title.y = element_text(size=8))+
+  facet_grid(age_group~.)
+
+library(cowplot)
+library(ggpubr)
+MAVOL_miR<- ggarrange(MA_miR_age_group, VOL_miR_age_group, nrow=1, labels = c("A","B"))
+MAVOL_miR
+```
+
+> volcano shape가 reference들과 다른 이유는 F-test를 통하여 분산검정 과정에 Sample 수가 적어 이분산검정으로 넘어간 sample이 많아졌기 때문 
+
+> 통계적으로 유의한 sample이 없음 >> n수가 적어서 그럴 가능성이 높음 
+
+### 3.3.3 2차성징 이전과 2차성징 이후의 gender-specific miRNA의 발현 양상 관찰 
+
+* Sexspecific gene을 volume 기준으로 선정한 miRNA를 gender specific miRNA라 가정하고 연령에 따른 변화 양상 파악 
+
+```{r}
+miR_DFC_DE %>%
+  filter(Gender_specific_by_volume != "Gender-neutral") %>% 
+  group_by(age_group) %>%
+  summarize("#_of_gender_sepecific_miRNA"=n_distinct(miRNA))
+```
+
+```{r}
+miR_DFC_DE
+```
+
+
+```{r}
+miR_DFC_DE<-miR_DFC_DE %>% mutate(age_specific=case_when((Gender_specific_by_volume!="Gender-neutral" & age_group == "Adult")~"adult_specific",
+                                              (Gender_specific_by_volume!="Gender-neutral" & age_group == "Youth")~"youth_specific",
+                                              TRUE ~ "Gender-neutral"))
+#연령에 따른 gender specific miRNA 추출 
+adult_miR <- miR_DFC_DE %>% filter(age_specific=="adult_specific") %>% pull(miRNA)
+youth_miR <- miR_DFC_DE %>% filter(age_specific=="youth_specific") %>% pull(miRNA)
+#해당 miRNA에 대응하는 상대 연령대의 Fold expression 추출 
+adult_miR <- miR_DFC_DE %>% subset(miRNA %in% adult_miR)
+youth_miR <- miR_DFC_DE %>% subset(miRNA %in% youth_miR)
+#Make slope chart
+slope_chart <- function(df){
+            df %>% ggplot(aes(age_group, Fold_Enrichment, group=miRNA)) +
+                geom_line(aes(color=Gender_specific_by_volume, label=miRNA))+
+                geom_text_repel(size=2)+
+                geom_point(size=5)+
+                scale_x_discrete(limits=c("Youth", "Adult")) +
+                coord_cartesian(ylim = c(-3, 3)) +
+                theme_bw() + 
+                theme(legend.position="top") 
+}
+SLOPE_age<- ggarrange(adult_miR %>% slope_chart(),youth_miR %>% slope_chart(), common.legend=TRUE)
+SLOPE_age
+```
+
+
+> 연령에 따라 뇌의 성별에 직접적으로 영향을 주는 miRNA가 다르다는 것을 추정할 수 있음 
+
+
+```{r}
+ggarrange(ggarrange(MA_miR_age_group, VOL_miR_age_group, ncol = 2)
+          , SLOPE_age, nrow=2)
+```
+
+
+```{r}
+ggdraw() +
+  draw_plot(MA_miR_age_group, x = 0, y = .5, width = .5, height = .5) +
+  draw_plot(VOL_miR_age_group, x = .5, y = .5, width = .5, height = .5) +
+  draw_plot(SLOPE_age, x = 0, y = 0, width = 1, height = 0.5) +
+  draw_plot_label(label = c("A", "B", "C"), size = 15,
+                  x = c(0, 0.5, 0), y = c(1, 1, 0.5))
+```
+
+> 뭉개진 비율을 살려내고 싶다... 
+
+```{r}
+library("gridExtra")
+grid.arrange(sp,                             # First row with one plot spaning over 2 columns
+             arrangeGrob(bxp, dp, ncol = 2), # Second row with 2 plots in 2 different columns
+             nrow = 2)                       # Number of rows
+```
+
+
+
+
+***
+
+
+# 4. mRNA analysis
+
+Q: 연령에 따라 DFC부분의 miRNA의 발현이 달라지는 패턴을 관찰한 이전의 data를 바탕으로 해당 top3 miRNA들의 target repression 여부를 확인하여 뇌의 성별결정에 있어서 miRNA에 의한 post-translational regulation이 역할을 하는지 추측해본다. 
+
+* top3 miRNA와 target list --> [TargetScanHuman](http://www.targetscan.org/vert_72/)의 annotation 이용
+
+
+```{r}
+adult_miR_top <- adult_miR %>% arrange(desc(Fold_Enrichment)) %>% head(n=3) %>% .$miRNA 
+adult_miR_top
+```
+
+- hsa-miR-144-3p target : http://www.targetscan.org/vert_72/temp/TargetScan7.2__miR-144-3p.predicted_targets.txt
+- hsa-miR-451a target : http://www.targetscan.org/vert_72/temp/TargetScan7.2__miR-451.predicted_targets.txt
+- hsa-miR-486-5p target : http://www.targetscan.org/vert_72/temp/TargetScan7.2__miR-486-5p.predicted_targets.txt
+
+
+```{r}
+youth_miR_top <- youth_miR %>% arrange(desc(Fold_Enrichment)) %>% head(n=3) %>% .$miRNA 
+youth_miR_top
+```
+
+- hsa-miR-409-5p target : http://www.targetscan.org/vert_72/temp/TargetScan7.2__miR-409-5p.predicted_targets.txt
+- hsa-miR-1271-5p target : http://www.targetscan.org/vert_72/temp/TargetScan7.2__miR-96-5p_1271-5p.predicted_targets.txt 
+- hsa-miR-577 target : http://www.targetscan.org/vert_72/temp/TargetScan7.2__miR-577.predicted_targets.txt 
+
+```{r}
+ADtop1 <- read.xlsx("miRTARGET/TargetScan7.2__miR-144-3p.predicted_targets.xlsx", header=TRUE)
+ADtop1
+```
+
+> 이유는 모르겠지만, 해당 파일을 열려고 하면 계속 커널이 죽어버리는 현상이 있음. 직접 파일을 만들어 오도록 함. 
+
+1. load the data 
+
+```{r}
+load('data_brainspan_DFC.20190928.Rdata')
+```
+
+2. check the number of adult donor 
+
+```{r}
+#Check the number of adult donot 
+s %>% filter(grepl(c("X"),donor_name)) %>% group_by(gender) %>% summarise("# of Adult" = length(donor_name))
+```
+
+3. wide to long 
+
+* preprocessing : 필요한 정보들 먼저 채우기 
+
+```{r}
+head(s) #donor name : s$donor_name 
+```
+
+```{r}
+head(g) #gene name : g$gene_symbol
+```
+
+```{r}
+head(e) # wide format // colume -> donor_name, row -> gene_symbol => make it long
+```
+
+```{r}
+names(e) <- s$donor_name
+gene_symbol <- g %>% select(gene_symbol) 
+e <- cbind(gene_symbol, e)
+e %>% head() # wide format 완성 
+```
+
+* wide to long 
+
+```{r}
+e <- e %>% gather(key="donor_name", value="RPKM", starts_with('H'), factor_key=FALSE)
+e %>% summarize("#_of_donor" = n_distinct(donor_name))
+```
+
+```{r}
+e %>% head()
+```
+
+* 나머지 일련정보 추가 
+
+```{r}
+e <- merge(e, s, by='donor_name', all.x=TRUE)
+e <- e %>% mutate("age_group_BS"=as.factor(do.call('rbind',strsplit(donor_name, split=".", fixed=TRUE))[,2])) %>%
+  mutate("age_group"=case_when(age_group_BS %in% c("X", "XI")~"Adult",
+                                      age_group_BS %in% c("VI", "VII", "VIII", "IX")~"Youth",
+                                      TRUE ~ "Fetus")) 
+```
+
+
+
+s %>% mutate("age_group_BS"=as.factor(do.call('rbind',strsplit(donor_name, split=".", fixed=TRUE))[,2])) %>%
+          mutate("age_group"=case_when(age_group_BS %in% c("X", "XI")~"Adult",
+                                      age_group_BS %in% c("VI", "VII", "VIII", "IX")~"Youth",
+                                      TRUE ~ "Fetus")) 
+donor_summary <- s %>%
+  group_by(gender,age_group) %>%
+  summarise("#_of_donor"=length(donor_name))
+
+s
+
+
+
+
+```{r}
+a <-s$donor_name[1]
+print(a)
+strsplit(a, fixed=TRUE, ".") #fixed : general exprssion을 사용하지 않고 문자열 그대로 인식 
+```
+
+```{r}
+df <- as_data_frame(s$donor_name)
+df
+df %>% mutate("age_group"=as.factor(do.call('rbind',strsplit(value, fixed=TRUE, "."))[,2]))
+```
+
+```{r}
+s <- s %>% mutate("age_group_BS"=as.factor(do.call('rbind',strsplit(donor_name, split=".", fixed=TRUE))[,2])) %>%
+          mutate("age_group"=case_when(age_group_BS %in% c("X", "XI")~"Adult",
+                                      age_group_BS %in% c("VI", "VII", "VIII", "IX")~"Youth",
+                                      TRUE ~ "Fetus")) 
+donor_summary <- s %>%
+  group_by(gender,age_group) %>%
+  summarise("#_of_donor"=length(donor_name))
+
+s
+```
+
+필요한 정보 : 1) Donor ID, 2) age_group, 3) age_group_BS, 4) age, 5)gender - 중복될 예정이므로 factor로
+
+
+* DESeq2 [Link](http://bioconductor.org/packages/devel/bioc/vignettes/DESeq2/inst/doc/DESeq2.html)
