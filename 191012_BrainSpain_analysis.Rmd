@@ -158,11 +158,6 @@ wget http://download.alleninstitute.org/brainspan/MicroRNA/MicroRNA.xls
 #install.packages('readxl')
 library(readxl)
 library(tidyverse)
-#library(tidyr)
-library(ggrepel)
-#library(ggplot2)
-library(gridExtra)
-
 ```
 
 ```{r}
@@ -316,11 +311,15 @@ miRDB %>% head()
 
   - cf_ long form의 data에서 쉽게 연산 변환이 가능 
 
-### 3.2.4 DFC region만 분리하여 분석 진행할 dataset 만들기 : `miRDB_DFC`
+### 3.2.4 DFC region만 분리하여 분석 진행할 dataset 만들기 : `miR_DFC`
 
+.-+
+  
 ```{r}
-miRDB_DFC <- miRDB %>% filter(structure == "DFC") 
-miRDB_DFC %>% group_by(gender, age_group) %>% summarize("Number_of_donor" = n_distinct(donor_name))
+miR_DFC <- miRDB %>% filter(structure == "DFC") 
+#save(miR_DFC, file="./BrainSpan_miR_analysis/miR_DFC.RData") #뒷부분에서 메모리 부족으로 저장이 되지 않는 듯하여 RData로 나누어 저장 후 불러옴. 
+load('./BrainSpan_miR_analysis/miR_DFC.RData') # tidy form of miRNA expression information of DFC region 
+miR_DFC %>% group_by(gender, age_group) %>% summarize("Number_of_donor" = n_distinct(donor_name))
 ```
 
 > 통계적 유의성을 고려하기에 n수가 부족하지만, human sample임에 의의를 두고 분석 진행 
@@ -355,14 +354,14 @@ miRDB_DFC %>% group_by(gender, age_group) %>% summarize("Number_of_donor" = n_di
 
 ```{r}
 #calculating by RPM
-miR_DFC_DE<- miRDB_DFC %>% filter(age_group == "Adult") %>% 
+miR_DFC_DE<- miR_DFC %>% filter(age_group == "Adult") %>% 
   group_by(gender, miRNA) %>% 
   summarize("average"=mean(RPM)) %>%
   spread(key="gender", value="average") %>%
   mutate("Fold_Enrichment" = F/M, "Average_expression"= F+M/2) 
 
-library(ggrepel)
 #plotting 
+library(ggrepel)
 miR_DFC_DE %>% ggplot(aes(Average_expression, Fold_Enrichment, na.rm=TRUE)) + 
   geom_point() +
   scale_x_continuous(trans = "log2") +
@@ -370,11 +369,13 @@ miR_DFC_DE %>% ggplot(aes(Average_expression, Fold_Enrichment, na.rm=TRUE)) +
   geom_text_repel(aes(label=ifelse(Average_expression > 4 & (Fold_Enrichment > 2 | Fold_Enrichment<0.5) , miRNA, "")))
 ```
 
+> 양수 쪽의 Fold Change에 치중된 경향 (labeling : |Fold expression| > 2, Average expression > 4)
+
 ##### 3.3.1.1.2 log2RPM이라는 확률변수를 먼저 정의한 경우
 
 ```{r}
 #log2 transformation
-miR_DFC_DE_log <- miRDB_DFC %>% filter(age_group == "Adult") %>% 
+miR_DFC_DE_log <- miR_DFC %>% filter(age_group == "Adult") %>% 
   group_by(gender, miRNA) %>% 
   summarize("average"=mean(log2RPM)) %>%
   spread(key="gender", value="average") %>%
@@ -398,23 +399,26 @@ miR_DFC_DE_log %>% ggplot(aes(Average_expression, Fold_Enrichment)) +
 * practice : t-test / f-test 
 
 ```#{r}
+#ptractice
 a<- c(7.694240, 7.721688)
 b<- c(7.971343, 7.178087)
 str(t.test(a,b)) 
 ```
 
 ````#{r}
+#practice
 t.test(a,b)[["p.value"]]
 ```
 
 ```#{r}
+#practice
 var.test(a,b)[["p.value"]]
 ```
 
 * pactice 
 
 ```{r}
-temp <- miRDB_DFC %>% 
+temp <- miR_DFC %>% 
   filter(miRNA %in% c("hsa-let-7c","hsa-let-7e-5p")) %>% 
   select(miRNA, age_group, gender, RPM, age_group)
 temp %>% 
@@ -462,7 +466,7 @@ temp %>% filter(age_group=="Adult") %>% FE_AVG()
 
 
 ```{r}
-miR_DFC_DE_each<- miRDB_DFC %>% filter(age_group=="Adult") %>% FE_AVG() 
+miR_DFC_DE_each<- miR_DFC %>% filter(age_group=="Adult") %>% FE_AVG() 
 miR_DFC_DE_each
 ```
 
@@ -597,7 +601,7 @@ Vol_miR
 *지금까지의 코드 정리 
 
 ```{r}
-miRDB  #tidy data
+miR_DFC %>% head()  #tidy data
 ```
 
 ```{r}
@@ -635,10 +639,12 @@ tidy_to_DEG <- function(tidy_df){
   fold_enrich_df <- merge(FEtemp, Qtemp, by='miRNA', all=TRUE)
   return (fold_enrich_df)
 }
+
+save(tidy_to_DEG, file='./BrainSpan_miR_analysis/tidy_to_DEG.RData') #tidy miRNA dataset to DEG result 
 ```
 
 ```{r}
-miR_DFC_DE <- miRDB_DFC %>% 
+miR_DFC_DE <- miR_DFC %>% 
               tidy_to_DEG() %>% 
               mutate(Gender_specific_by_volume = case_when((Average_expression > 4 & Fold_Enrichment > 1)~"Female_enriched",
                                                             (Average_expression > 4 & Fold_Enrichment < -1)~"Male_enriched",
@@ -646,6 +652,7 @@ miR_DFC_DE <- miRDB_DFC %>%
               mutate(Gender_specific_by_sig = case_when((Q_score > 1.3 & Fold_Enrichment > 1)~"Female_enriched",
                                                             (Q_score > 1.3 & Fold_Enrichment < -1)~"Male_enriched",
                                                             TRUE~"Gender-neutral")) 
+save(miR_DFC_DE, file="BrainSpan_miR_analysis/miR_DFC_DE.RData")
 
 ## Make MA plot 
 MA_miR_age_group <- miR_DFC_DE %>%
@@ -660,6 +667,8 @@ MA_miR_age_group <- miR_DFC_DE %>%
   geom_hline(yintercept = 1, colour="darkred", linetype="dashed", alpha=0.5) + 
   geom_hline(yintercept = -1, colour="darkblue", linetype="dashed", alpha=0.5) + 
   geom_vline(xintercept = 4, colour="darkgrey", linetype="dashed") +
+  geom_text(aes(x=11, y=4, label="FE>1, Average expression>4"), size=2.5, color="darkred") +
+  geom_text(aes(x=11, y=-4, label="FE<1, Average expression>4"), size=2.5, color="darkblue") +
   coord_cartesian(xlim =c(-5, 20), ylim = c(-4, 4)) +
   geom_text_repel(aes(label=ifelse((Average_expression > 4 & abs(Fold_Enrichment) > 1), as.character(miRNA), "")), size=2, force=8) +
   theme_bw() +
@@ -684,6 +693,7 @@ VOL_miR_age_group <- miR_DFC_DE %>%
   geom_vline(xintercept = -1, colour="darkblue", linetype="dashed", alpha=0.5) + 
   geom_vline(xintercept = 1, colour="darkred", linetype="dashed") +
   coord_cartesian(xlim =c(-5, 5), ylim = c(0, 4)) +
+   geom_text(aes(x=4, y=1.5, label="p-value<0.05"), size=3, color="darkgrey") +
   geom_text_repel(aes(label=ifelse((Q_score > 1.3 & abs(Fold_Enrichment) > 1), as.character(miRNA), "")), size=2, force=8) +
   theme_bw() +
   theme(legend.position=c(0.8, 0.91), 
@@ -694,10 +704,14 @@ VOL_miR_age_group <- miR_DFC_DE %>%
         axis.title.y = element_text(size=8))+
   facet_grid(age_group~.)
 
-#library(cowplot)
-library(ggpubr)
-MAVOL_miR<- ggarrange(MA_miR_age_group, VOL_miR_age_group, nrow=1, labels = c("A","B"))
-MAVOL_miR #plot1 
+library(cowplot)
+
+DEGplot_age <- ggdraw() + 
+  draw_plot(MA_miR_age_group, x = 0, y = 0, width = .5, height = 1) +
+  draw_plot(VOL_miR_age_group, x=.5, y = 0, width = .5, height = 1 )
+save_plot("DEGplot_age.png", DEGplot_age)
+save(DEGplot_age, file="./BrainSpan_miR_analysis/DEGplot_age.RData")
+DEGplot_age
 ```
 
 > volcano shape가 reference들과 다른 이유는 F-test를 통하여 분산검정 과정에 Sample 수가 적어 이분산검정으로 넘어간 sample이 많아졌기 때문 
@@ -717,6 +731,7 @@ MAVOL_miR #plot1
 * Sexspecific gene을 volume 기준으로 선정한 miRNA를 gender specific miRNA라 가정하고 연령에 따른 변화 양상 파악 
 
 ```{r}
+load("./BrainSpan_miR_analysis/miR_DFC_DE.RData")
 miR_DFC_DE %>%
   filter(Gender_specific_by_volume != "Gender-neutral") %>% 
   group_by(age_group) %>%
@@ -724,11 +739,12 @@ miR_DFC_DE %>%
 ```
 
 ```{r}
-miR_DFC_DE #precessed data set 
+str(miR_DFC_DE) #processed data set 
 ```
 
 
 ```{r}
+
 miR_DFC_DE<-miR_DFC_DE %>% mutate(age_specific=case_when((Gender_specific_by_volume!="Gender-neutral" & age_group == "Adult")~"adult_specific",
                                               (Gender_specific_by_volume!="Gender-neutral" & age_group == "Youth")~"youth_specific",
                                               TRUE ~ "Gender-neutral"))
@@ -740,33 +756,45 @@ youth_miR <- miR_DFC_DE %>% filter(age_specific=="youth_specific") %>% pull(miRN
 #해당 miRNA에 대응하는 상대 연령대의 Fold expression 추출 
 adult_miR <- miR_DFC_DE %>% subset(miRNA %in% adult_miR)
 youth_miR <- miR_DFC_DE %>% subset(miRNA %in% youth_miR)
+save(adult_miR,file='./BrainSpan_miR_analysis/adult_specific_gender_miRNA.RData')
+save(youth_miR,file="./BrainSpan_miR_analysis/youth_specific_gender_miRNA.RData")
+```
 
+```{r}
+load('./BrainSpan_miR_analysis/adult_specific_gender_miRNA.RData')
+load("./BrainSpan_miR_analysis/youth_specific_gender_miRNA.RData")
 #Make slope chart
 MA_adult <- adult_miR %>% ggplot(aes(age_group, Fold_Enrichment, group=miRNA, color=Gender_specific_by_volume)) +
                 geom_line()+
-                geom_text_repel(aes(label=ifelse(age_group=="Adult",miRNA,"")), size=3.5, nudge_x=-0.01, nudge_y=0.01, force=25)+
+                geom_text_repel(aes(label=ifelse(age_group=="Adult",miRNA,"")), size=2.5, nudge_x=-0.01, nudge_y=0.01, force=25)+
                 geom_point(size=3.5)+
                 scale_x_discrete(limits=c("Youth", "Adult")) +
                 coord_cartesian(ylim = c(-3, 3)) +
                 xlab("") +
                 ylab("") +
                 ggtitle("Adult Specific") + 
+                theme(plot.title=element_text(size=10))+
                 theme_bw() 
 
 MA_youth <- youth_miR %>% ggplot(aes(age_group, Fold_Enrichment, group=miRNA, color=Gender_specific_by_volume)) +
                 geom_line()+
-                geom_text_repel(aes(label=ifelse(age_group=="Youth",miRNA,"")), size=3.5, nudge_x=-0.01, force=30)+
+                geom_text_repel(aes(label=ifelse(age_group=="Youth",miRNA,"")), size=2.5, nudge_x=-0.01, force=30)+
                 geom_point(size=3.5)+
                 scale_x_discrete(limits=c("Youth", "Adult")) +
                 coord_cartesian(ylim = c(-3, 3)) +
                 xlab("") +
                 ylab("") +
                 ggtitle("Youth Specific") + 
+                theme(plot.title=element_text(size=10))+
                 theme_bw() 
 
-SLOPE_age <- ggarrange(MA_youth, MA_adult, common.legend=TRUE, legend="bottom")
+library(ggpubr)
+SLOPE_age <- ggarrange(MA_youth, MA_adult, common.legend=TRUE, legend="bottom") 
+SLOPE_age <- annotate_figure(SLOPE_age,
+                left = text_grob("Fold Enrichment\n[log2(Female/Male)]", color = "black", rot = 90, size=10))
+save_plot("SLOPE_age.png", SLOPE_age)
+save(SLOPE_age, file="./BrainSpan_miR_analysis/SLOPE_age.RData")
 SLOPE_age
-
 ```
 
 
@@ -795,16 +823,15 @@ reference)
 
 ## 4.1 Top gender specific miRNA selection 
 
-* miRNA Fold_Enrichment top 2개까지 후보로 삼아 target repression 정도를 cumulative graph로 확인 
-
 ### 4.1.1 Adult female miRNA target : `adult_FmiR`
 
 ```{r}
 #adult_miR : adult에서 specific하게 gender specificity가 있는 miRNA group 
-adult_miR %>% filter(age_group=="Adult") %>% arrange(desc(Fold_Enrichment)) %>% head(n=2) %>% .$miRNA 
+adult_miR %>% filter(age_group=="Adult") %>% arrange(desc(Fold_Enrichment)) %>% head(n=3) %>% .$miRNA 
 ```
 
 ```{r}
+#library(tidyverse)
 read_target <- function(file){
   # 파일 읽고 중복 제거해서 list로 retur
   read.table(file) %>% pull() %>% as.character() %>% unique() %>% return()
@@ -812,20 +839,20 @@ read_target <- function(file){
 ```
 
 ```{r}
-adult_FmiR_target <- read_target("./adult_female")
+adult_FmiR_target <- read_target("./miRTARGET/adult_bgfmir_target.txt")
 ```
 
 ### 4.1.2 Adult male miRNA : `adult_MmiR`
 
 ```{r}
-adult_miR %>% filter(age_group=="Adult") %>% arrange(Fold_Enrichment) %>% head(n=2) %>% .$miRNA 
+adult_miR %>% filter(age_group=="Adult") %>% arrange(Fold_Enrichment) %>% head(n=3) %>% .$miRNA 
 ```
 
 ```{r}
-adult_MmiR_target <- read_target("./adult_male") 
+adult_MmiR_target <- read_target("./miRTARGET/adult_mmir_target.txt") 
 ```
 
-### 4.1.3 Youth female miRNA : `youth_Fmir`
+### 4.1.3 Youth Female miRNA : `youth_Fmir`
 
 ```{r}
 youth_miR %>% filter(age_group=="Youth") %>% arrange(desc(Fold_Enrichment)) %>% head(n=3) %>% .$miRNA 
@@ -833,19 +860,22 @@ youth_miR %>% filter(age_group=="Youth") %>% arrange(desc(Fold_Enrichment)) %>% 
 
 
 ```{r}
-youth_Fmir_target <- read_target("./youth_female")
+youth_Fmir_target <- read_target("./miRTARGET/youth_fmir_target.txt")
 ```
 
-### 4.1.4 Youth male miRNA : `youth_Mmir`
+### 4.1.4 Youth Male miRNA : `youth_Mmir`
 
 ```{r}
-youth_miR %>% filter(age_group=="Youth") %>% arrange(desc(Fold_Enrichment)) %>% head(n=3) %>% .$miRNA
+youth_miR %>% filter(age_group=="Youth") %>% arrange(Fold_Enrichment) %>% head(n=3) %>% .$miRNA
 ```
 
 ```{r}
-youth_Mmir_target <- read_target("./youth_male")
+youth_Mmir_target <- read_target("./miRTARGET/youth_mmir_target.txt")
 ```
 
+```{r}
+save(adult_FmiR_target, adult_MmiR_target, youth_Fmir_target, youth_Mmir_target, file = "./BrainSpan_miR_analysis/bgmiR_target.RData")
+```
 
 ## 4.2. mRNA data preprocessing
 
@@ -853,6 +883,7 @@ youth_Mmir_target <- read_target("./youth_male")
 
 ```{r}
 load('data_brainspan_DFC.20190928.Rdata')
+load('./BrainSpan_miR_analysis/bgmiR_target.RData')
 ```
 
 ### 4.2.1.2 check the number of adult donor 
@@ -893,6 +924,7 @@ e %>% summarize("#_of_donor" = n_distinct(donor_name))
 ```
 
 ```#{r}
+#practice
 names(e)[3] <-c("log2RPKM")
 e %>% mutate(log2RPKM=log2(log2RPKM))
 ```
@@ -900,7 +932,6 @@ e %>% mutate(log2RPKM=log2(log2RPKM))
 #### 4.2.2.3 나머지 일련정보 추가 
 
 * 필요한 일련정보 : donor_name, gender, age_group(FETUS제외)
-
 ```{r}
 s_sub <- s %>% mutate("age_group_BS"=as.factor(do.call('rbind',strsplit(donor_name, split=".", fixed=TRUE))[,2])) %>%
                mutate("age_group"=case_when(age_group_BS %in% c("X", "XI")~"Adult",
@@ -911,6 +942,7 @@ s_sub <- s %>% mutate("age_group_BS"=as.factor(do.call('rbind',strsplit(donor_na
 s_sub
 ```
 
+* log transformation
 ```{r}
 e <- e %>% mutate(log2RPKM=log2(RPKM)) %>% select(gene_symbol, donor_name, log2RPKM)
 ```
@@ -920,7 +952,20 @@ e <- merge(e, s_sub, by='donor_name', all=FALSE)
 e%>%head()
 ```
 
+```{r}
+save(e, file = "./BrainSpan_miR_analysis/DFC_mRNA_tidy.RData")
+```
+
+
 #### 4.2.2.4 cumulative fraction
+
+```{r}
+load('./BrainSpan_miR_analysis/DFC_mRNA_tidy.RData')
+load('./BrainSpan_miR_analysis/bgmiR_target.RData')
+```
+
+* calculating the fold change of mRNA expression 
+
 ```{r}
 e <- e %>% 
   group_by(gene_symbol, gender, age_group) %>%
@@ -929,13 +974,6 @@ e <- e %>%
   mutate("Fold_Enrichment"=F-M) 
 ```
 
-```{r}
-makePlot<-function(){
-  x<-1:10; y1=x*x; y2=2*y1
-  plot(x, y1, type="b", pch=19, col="red", xlab="x", ylab="y")
-  lines(x, y2, pch=18, col="blue", type="b", lty=2)
-}
-```
 
 ```{r}
 Youth <- e %>% filter(age_group=="Youth") 
@@ -943,15 +981,15 @@ CUM_youth <- ggplot() +
   stat_ecdf(aes(Youth$Fold_Enrichment),color="darkgrey") +
   stat_ecdf(aes(Youth %>% filter(gene_symbol %in% youth_Fmir_target) %>% .$Fold_Enrichment), color="red") +
   stat_ecdf(aes(Youth %>% filter(gene_symbol %in% youth_Mmir_target) %>% .$Fold_Enrichment), color="blue") +
+  geom_text(aes(x=-1, y=1, label = "Target of female specific miRNA in DFC"), color = "red", hjust=0, size=2.5) + 
+  geom_text(aes(x=-1, y=0.92, label = "Target of male specific miRNA in DFC"), color = "blue", hjust=0, size=2.5) +
+  geom_text(aes(x=-1, y=0.84, label = "Total mRNA in DFC"), color = "Darkgrey", hjust=0, size=2.5) + 
   xlim(c(-1,1)) +
   ylim(c(0,1))+
-
   xlab("Fold Enrichment [log2(Female/Male)]")+
-  ylab("Cumulative fraction")+
+  ylab("") +
   geom_vline(xintercept = 0, colour="darkgrey", linetype="dashed") + 
-  ggtitle("Youth-specific sexual differenctial miRNA") +
   theme_bw()
-
 ```
 
 ```{r}
@@ -960,18 +998,63 @@ CUM_adult <- ggplot() +
   stat_ecdf(aes(Adult$Fold_Enrichment),color="darkgrey") +
   stat_ecdf(aes(Adult %>% filter(gene_symbol %in% adult_FmiR_target) %>% .$Fold_Enrichment), color="red") +
   stat_ecdf(aes(Adult %>% filter(gene_symbol %in% adult_MmiR_target) %>% .$Fold_Enrichment), color="blue") +
+  geom_text(aes(x=-1, y=1, label = "Target of female specific miRNA in DFC"), color = "red", hjust=0, size=2.5) + 
+  geom_text(aes(x=-1, y=0.92, label = "Target of male specific miRNA in DFC"), color = "blue", hjust=0, size=2.5) +
+  geom_text(aes(x=-1, y=0.84, label = "Total mRNA in DFC"), color = "Darkgrey", hjust=0, size=2.5) + 
   xlim(c(-1,1)) +
   ylim(c(0,1))+
-  annotate("rect", alpha = 0.5, ymin=0,ymax=6,xmin=0,xmax=25,fill="brown1") +
-  annotate("rect", alpha = 0.5, ymin=0,ymax=6,xmin=0,xmax=-25,fill="blue") +
   xlab("Fold Enrichment [log2(Female/Male)]")+
-  ylab("Cumulative fraction")+
+  ylab("") +
   geom_vline(xintercept = 0, colour="darkgrey", linetype="dashed") + 
-  ggtitle("Adult-specific sexual differenctial miRNA") +
   theme_bw()
 ```
 
 ```{r}
-ggarange(SLOPE_age, ggarrange(CUM_youth,CUM_adult), nrow=2)
+load("./BrainSpan_miR_analysis/SLOPE_age.RData")
+CUM_sum <- ggarrange(CUM_youth, CUM_adult)
+CUM_sum <- annotate_figure(CUM_sum, 
+                left = text_grob("Cumulative fraction", color = "black", rot=90))
+save(CUM_sum, file='./BrainSpan_miR_analysis/bg_target_cumilative.RData')
+CUM_sum
 ```
 
+```{r}
+load('./BrainSpan_miR_analysis/bg_target_cumilative.RData')
+load('./BrainSpan_miR_analysis/SLOPE_age.RData')
+SLOPE_CUM <-  ggdraw() + 
+  draw_plot(SLOPE_age, x = 0, y = 0.45, width = 1, height = 0.55) +
+  draw_plot(CUM_sum, x=0, y = 0, width = 1, height = 0.45)
+SLOPE_CUM
+save(SLOPE_CUM, file='./BrainSpan_miR_analysis/SLOPE_CUM.RData')
+```
+
+
+# 5.정리 
+
+plot1 : 
+```{r}
+load('./BrainSpan_miR_analysis/DEGplot_age.RData')
+load('./BrainSpan_miR_analysis/SLOPE_CUM.RData')
+
+DEGplot_age
+```
+
+> 2차성징 이전과 이후, DFC region에서 발현되는 miRNA의 변화를 확인하였다. 먼저 miRNA expression을 기준으로 log2RPM>4인 miRNA들에서 여성과 남성의 RPM 비율이 2배 이상 나는 miRNA들을 성별 결정에 영향을 주는 miRNA 후보로 선정하였다. 각 후보는 Youth와 Adult에서 서로 다른 분포를 보였다. 하지만 안타깝게도 n=2라는 한계로 인하여, 해당 cut-off에서 t-test 기준 통계적으로 유의한 변화를 보이는 miRNA는 존재하지 않았다. 
+
+> 이는 DFC region에 성별에 의하여 서로 상이한 발현을 보이는 miRNA가 없을 것이라고도 생각할 수 있으나, donor의 수가 제한적이므로, Average Expression 기준으로 cut-off를 넘은 miRNA 전체를 성별에 따라 발현이 다른 miRNA 후보로 선정하였다. 
+
+plot2 :
+```{r}
+SLOPE_CUM
+```
+
+> 선정된 miRNA이 실제로 특정 연령대에서만 specificity를 보이는 miRNA인지 알아보기 위하여 Youth-specific&Gender-specific miRNA와 Adult-specific&Gender-specific miRNA가 연령 변화에 따라 어떠한 양상을 보이는지 살펴보았다. 대부분의 Gender-specific miRNA들은 특정 연령에서만 성별 특이적 발현 양상을 보이며, 해당 시기를 지나거나 이전에는 성별 특이적 발현 양상이 보이지 않는다는 것을 알 수 있었다. 
+
+> 해당 miRNA들이 실제로 작동하는지를 알아보기 위하여 해당 miRNA target list를 target scan에서 수집하였다. Brain-Span에서  제공된 DFC region의 mRNA expression 정보에서 성별 특이적 miRNA target들이 실제로 repression되는지 cumulative fraction의 변화를 통하여 확인하였다.
+
+ 1. Youth 시기 : Female specific miRNA target들은 감소하는 경향이 아닌 증가하는 경향을 보였다. 이는 target scan에서 제공하는 miRNA target list가 putative target이므로 매우 보수적인 검정에 속한다고 볼 수 있기에 확답을 내리기는 어려울 것이나, youth 시기의 female enriched miRNA는 역할을 하지 않을 가능성이 높을 것으로 추측된다. 반면 male enriched miRNA의 target들은 전체 mRNA의 foled enrichment에 비하여 증가하는 양상을 보였다. 따라서 Youth시기에는 male enriched miRNA가 더욱 활발히 작동할 것으로 추측된다. 이는 형태적/기능적 측면에서도 female이 default로서 발생하는 생물학적 현상을 일부 반영하는 것이 아닐까 추측된다. 즉, female형 DFC가 먼저 발생한 후 miRNA에 의한 post-transcriptional regulation에 의하여 특정 mRNA들의 발현양상이 변화하며, 이로서 male 특이적인 DFC가 형성되는 것이 아닐까 추측한다.
+ 
+  2. Aduct 시기 : Youth 시기와 반대로 Female 특이적인 miRNA들이 강력하게 작동하는 것으로 보인다. 이는 가임기에 도달한 후 시작되는 여성들의 호르몬 주기에 의하여 특정 miRNA들이 활발히 발현하고, 이 발현 양상이 DFC영역에 강력하게 영향을 주는 것이 아닐까 추측된다. 
+  
+  
+  아쉽게도 본 데이터들은 통계적 유의성을 확보하기에 부족한 donor 수를 지니고 있어 정확한 분석이 어렵다. 이를 재확인 하기 위하여 TCGA의 LGG(Low Grade Glioma)환자들의 miRNA expression 정보를 추가하여 추가 분석을 진행하는 방향이 바람직할 것으로 보인다. 또한 mouse에서의 발현 양상도 이를 반영하는지 확인하여, loss-of-function study, gain-of-function study를 할 수 있는 실험 모델을 확립하고 동물실험을 통하여 DFC에서의 해당 miRNA들의 역할을 규명할 수 있다면, 이번 분석의 진위를 가릴 수 있을 것으로 보인다.
