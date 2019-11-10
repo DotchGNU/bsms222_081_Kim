@@ -120,7 +120,7 @@ Here we do not cover these details. Instead, we will discuss an incredibly usefu
 
 ***
 
-# ** 14.4 Distributions versus probability distribution**
+# **14.4 Distributions versus probability distribution**
 
 * Distribution : $x_1, x_2, ..., x_n$
 
@@ -141,7 +141,7 @@ A random variable $X$ has a distribution function. not real list, rather theoret
 
 *** 
 
-# ** 14.5 Notation for random variables**
+# **14.5 Notation for random variables**
 
 In statistical textbooks,
 
@@ -157,7 +157,7 @@ In statistical textbooks,
 
 ***
 
-# ** 14.6 The expected value and standard error 
+# **14.6 The expected value and standard error**
 
 * $E[X]$ : expected value of random variable $X$.
 
