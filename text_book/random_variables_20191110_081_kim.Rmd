@@ -1,0 +1,240 @@
+---
+title: "Chap 14. Random variables"
+output: html_notebook
+---
+
+* How to mathmatically describe random variables. 
+
+***
+# **14.1 Random variables**
+
+* Random variabes : numeric outcomes resulting from random processes. 
+
+```{r}
+beads <- rep( c("red", "blue"), times = c(2,3))
+X <- ifelse(sample(beads, 1) == "blue", 1, 0)
+```
+
+Here `X` is a random variable : every time we select a new bead the outcome changes randomly. See below:
+
+```{r}
+ifelse(sample(beads, 1) == "blue", 1, 0)
+```
+
+```{r}
+ifelse(sample(beads, 1) == "blue", 1, 0)
+```
+
+```{r}
+ifelse(sample(beads, 1) == "blue", 1, 0)
+```
+
+***
+
+# **14.2 Sampling models**
+
+random variable $S$ that will represent the casino's total winning. 
+
+* constructing the urn 
+
+```{r}
+color <- rep(c("Black", "Red", "Green"), c(18, 18, 2)) #make the roulette wheel with 18 red, 18 black, 2 green 
+```
+
+* playing 1,000 times independently; red="-1", others="+1"
+
+```{r}
+n <- 1000 #replicates
+X <- sample(ifelse(color == "Red", -1, 1), n, replace = TRUE)
+X[1:10]
+```
+
+```{r}
+X <- sample(c(-1, 1), n, replace = TRUE, prob = c(9/19, 10/19))
+X %>% data_frame() %>% ggplot(aes(X)) + geom_bar()
+```
+
+We call this a **sampling model** since we are modeling the random behavior of roulette with the sampling of draws from an urn. The total winnings  $S$ is simply the sum of these 1,000 independent draws:
+
+```{r}
+X <- sample(c(-1, 1), n, replace = TRUE, prob = c(9/19, 10/19))
+S <- sum(X)
+S
+````
+
+***
+
+# **14.3 The probability distribution of a random variable**
+
+$S$ is a random variable ==> it changes every runs. ==> "Probability distribution"
+
+* If we want to know the probability that we lose money, we are asking the probability that $S$ is in the interval $S<0$.
+
+* Estimate the distribution : using Monte Carlo simulation 
+
+```{r}
+n <- 1000 #the number of games
+B <- 10000 #the replicates of simulation
+
+roulette_winnings <- function(n){
+  X <- sample(c(-1,1), n, replace=TRUE, prob=c(9/19, 10/19))
+  sum(X)
+}
+
+S <- replicate(B, roulette_winnings(n))
+```
+
+```{r}
+mean(S<0)
+```
+
+
+```{r}
+S %>% data_frame() %>% ggplot(aes(S)) + geom_histogram()
+```
+
+* distribution appears to be approximately normal.
+
+  + expected value : average of approximated normal distribution 
+  
+  + standard error : standard deviation of approximated normal distributon
+  
+* example above : $(S+n)/2$ follows a binomial distribution 
+
+  + $Pr(S<0) = Pr(S+n)/2 < (0+n)/2)$
+  
+  + can use the `pbinom` to compute `Pr(S<0)`
+  
+```{r}
+n <- 1000
+pbinom(n/2, size = n, prob = 10/19)
+```
+
+Because this is a discrete probability function, to get $Pr(S<0)$ rather than $Pr(S<=0)$, we write:
+
+```{r}
+pbinom(n/2-1, size=n, prob=10/19)
+```
+
+Here we do not cover these details. Instead, we will discuss an incredibly useful approximation provided by mathematical theory that applies generally to sums and averages of draws from any urn: the **Central Limit Theorem (CLT)**.
+
+***
+
+# ** 14.4 Distributions versus probability distribution**
+
+* Distribution : $x_1, x_2, ..., x_n$
+
+* Probability distribution : $F(a)$ ; what proportion of the list is less than or equal to $a$ 
+
+```{r}
+#to summarise F(a)
+m <- sum(x)/length(x)
+s <- sqrt(sum(s - m)^2 / length(x))
+```
+
+A random variable $X$ has a distribution function. not real list, rather theoretical concept. 
+
+* What is the probability that $X$ is less than or equal to $a$? $F(a)$ (not the list, it's number)
+
+* Under standing $X$ (list, not the number) : to run a Monte Carlo simulation and generate a very large list of outcomes of $X$. These outcomes are a list of numbers. 
+
+
+*** 
+
+# ** 14.5 Notation for random variables**
+
+In statistical textbooks,
+
+* upper case letters : random variables 
+
+* lower case letters : observed values 
+
+* $X<=x$
+
+  + $X$ : random quantity that we will see in the future (not an observed quantity)
+  
+  + $x$ : oberved value 
+
+***
+
+# ** 14.6 The expected value and standard error 
+
+* $E[X]$ : expected value of random variable $X$.
+
+  - definition : one draw is the average of the numbers in the urn 
+  
+  - general formula : $E(X) = ap + b(1-p)$ (two possible outcome $a, b$ with proportions $p$ and $1-p$, for binomeal)
+  
+```{r}
+B <- 10^6
+x <- sample(c(-1, 1), B, replace = TRUE, prob = c(9/19, 10/19))
+mean(x)
+```
+
+* $SE(X)$ : standard error of a random variable $X$ 
+
+  - definition : standard deviation of the sampling distribution  
+  
+  - general formula : $|b-a|\sqrt{p(1-p)}$
+
+```{r}
+2 * sqrt(90)/19
+```
+
+```{r}
+n <- 1000
+sqrt(n) * 2 * sqrt(90)/19
+```
+
+**Advanced note**: Before continuing we should point out that exact probability calculations for the casino winnings can be performed with the binomial distribution. However, here we focus on the CLT, which can be generally applied to sums of random variables in a way that the binomial distribution can’t.
+
+## 14.6.1 Population SD versus the sample SD 
+
+```{r}
+library(dslabs)
+x <- heights$height
+m <- mean(x)
+s <- sqrt(mean((x-m)^2))
+```
+
+
+* average
+
+$$
+\mu = \frac{1}{n} \sum_{i=1}^n x_i
+$$
+
+* standard deviation
+
+$$
+\sigma = \sqrt{\frac{1}{n} \sum_{i=1}^n (x_i - \mu)^2}
+$$
+
+However, be aware that the `sd` function returns a slightly different result:
+
+```{r}
+identical(s, sd(x))
+```
+
+```{r}
+s - sd(x)
+```
+
+* `s` is for population.
+
+$$
+\sigma = \sqrt{\frac{1}{n} \sum_{i=1}^n (x_i - \mu)^2} \\(=s)
+$$
+
+* `sd(x)` is for samples.
+
+$$
+sd(x) = \sqrt{\frac{1}{N-1} \sum_{i=1}^N (X_i - \bar{X})^2}
+$$
+
+```{r}
+n <- length(x)
+s-sd(x)*sqrt((n-1)/n)
+```
+
+Throughout this book, assuming $\sqrt{(N-1)/N} \approx 1$ to use `sd(x)` function. 
