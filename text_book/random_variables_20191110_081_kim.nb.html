@@ -1814,6 +1814,9 @@ summary {
 </ul>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuY29sb3IgPC0gcmVwKGMoXCJCbGFja1wiLCBcIlJlZFwiLCBcIkdyZWVuXCIpLCBjKDE4LCAxOCwgMikpICNtYWtlIHRoZSByb3VsZXR0ZSB3aGVlbCB3aXRoIDE4IHJlZCwgMTggYmxhY2ssIDIgZ3JlZW4gXG5gYGAifQ== -->
+<pre class="r"><code>color &lt;- rep(c(&quot;Black&quot;, &quot;Red&quot;, &quot;Green&quot;), c(18, 18, 2)) #make the roulette wheel with 18 red, 18 black, 2 green </code></pre>
+<!-- rnb-source-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
 <ul>
@@ -2019,6 +2022,12 @@ s &lt;- sqrt(sum(s - m)^2 / length(x))</code></pre>
 <h2>14.6.1 Population SD versus the sample SD</h2>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxubGlicmFyeShkc2xhYnMpXG54IDwtIGhlaWdodHMkaGVpZ2h0XG5tIDwtIG1lYW4oeClcbnMgPC0gc3FydChtZWFuKCh4LW0pXjIpKVxuYGBgIn0= -->
+<pre class="r"><code>library(dslabs)
+x &lt;- heights$height
+m &lt;- mean(x)
+s &lt;- sqrt(mean((x-m)^2))</code></pre>
+<!-- rnb-source-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
 <ul>
@@ -2080,11 +2089,533 @@ sd(x) = \sqrt{\frac{1}{N-1} \sum_{i=1}^N (X_i - \bar{X})^2}
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
 <p>Throughout this book, assuming <span class="math inline">\(\sqrt{(N-1)/N} \approx 1\)</span> to use <code>sd(x)</code> function.</p>
+<hr />
+</div>
+</div>
+<div id="central-limit-theorem" class="section level1">
+<h1><strong>14.7 Central Limit Theorem</strong></h1>
+<ul>
+<li><p>CLT : sample size가 매우 크면 독립시행에 대한 확률분포가 근사적으로 정규분포에 다가간다는 이론</p>
+<ul>
+<li><p>그렇게 된다면, 확률분포를 나타내기 위하여 필요한 것은 average와 standard deviation이면 충분.</p></li>
+<li><p>독립시행이 Bionomeal 의 경우만 그러한가? 모든 경우에 그러한가?</p></li>
+</ul></li>
+</ul>
+<p>The <strong>Central Limit Theorem (CLT)</strong> tells us that <em>when the number of draws, also called the sample size, is large, the probability distribution of the sum of the independent draws is approximately normal.</em> Because sampling models are used for so many data generation processes, the CLT is considered one of the most important mathematical insights in history.</p>
+<p>Previously, we discussed that if we know that the distribution of a list of numbers is approximated by the normal distribution, all we need to describe the list are the <em>average</em> and <em>standard deviation.</em> We also know that the same applies to probability distributions. If a random variable has a probability distribution that is approximated with the normal distribution, then all we need to describe the probability distribution are the average and standard deviation, referred to as the expected value and standard error.</p>
+<p>We previously ran this Monte Carlo simulation:</p>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxubiA8LSAxMDAwXG5CIDwtIDEwMDAwXG5yb3VsZXR0ZV93aW5uaW5ncyA8LSBmdW5jdGlvbihuKXtcbiAgWCA8LSBzYW1wbGUoYygtMSwxKSwgbiwgcmVwbGFjZT1UUlVFLCBwcm9iPWMoOS8xOSwgMTAvMTkpKVxuICBzdW0oWClcbn1cblMgPC0gcmVwbGljYXRlKEIsIHJvdWxldHRlX3dpbm5pbmdzKG4pKVxuYGBgIn0= -->
+<pre class="r"><code>n &lt;- 1000
+B &lt;- 10000
+roulette_winnings &lt;- function(n){
+  X &lt;- sample(c(-1,1), n, replace=TRUE, prob=c(9/19, 10/19))
+  sum(X)
+}
+S &lt;- replicate(B, roulette_winnings(n))</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-plot-begin eyJjb25kaXRpb25zIjpbWzAsImBzdGF0X2JpbigpYCB1c2luZyBgYmlucyA9IDMwYC4gUGljayBiZXR0ZXIgdmFsdWUgd2l0aCBgYmlud2lkdGhgLlxuIl1dLCJoZWlnaHQiOjQzMi42MzI5LCJzaXplX2JlaGF2aW9yIjowLCJ3aWR0aCI6NzAwfQ== -->
+<p><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAArwAAAGwCAMAAAB8TkaXAAACIlBMVEUAAAACAgIDAwMFBQUHBwcJCQkLCwsMDAwNDQ0PDw8QEBARERESEhIUFBQVFRUWFhYXFxcZGRkeHh4hISEjIyMkJCQpKSkrKysvLy8wMDAxMTEyMjIzMzM2NjY3Nzc4ODg5OTk+Pj4/Pz9AQEBBQUFCQkJDQ0NGRkZHR0dISEhNTU1OTk5PT09QUFBRUVFSUlJTU1NVVVVWVlZXV1dYWFhZWVlaWlpbW1tcXFxdXV1eXl5fX19hYWFiYmJjY2NkZGRlZWVmZmZnZ2dpaWlqampra2tsbGxtbW1ubm5xcXFycnJzc3N0dHR1dXV3d3d4eHh6enp8fHx/f3+AgICBgYGCgoKEhISFhYWHh4eIiIiJiYmKioqLi4uOjo6RkZGSkpKTk5OUlJSVlZWWlpaXl5eYmJiZmZmampqbm5ucnJydnZ2goKChoaGioqKjo6OlpaWmpqaoqKipqamqqqqrq6usrKytra2urq6vr6+ysrK0tLS1tbW2tra4uLi6urq7u7u9vb2+vr6/v7/AwMDBwcHCwsLFxcXGxsbJycnKysrLy8vMzMzNzc3Pz8/Q0NDR0dHT09PU1NTV1dXW1tbY2Njb29vf39/h4eHi4uLj4+Pk5OTl5eXm5ubn5+fo6Ojp6enq6urr6+vs7Ozt7e3u7u7v7+/w8PDx8fHy8vLz8/P09PT19fX29vb39/f4+Pj5+fn6+vr7+/v8/Pz9/f3+/v7///9bs8PVAAAACXBIWXMAAA7DAAAOwwHHb6hkAAAQ3klEQVR4nO3d+59UdR3H8c1LlqVUmlltN9M0rTbSuLZGCAmEmGCBRhAZannL25JFauiGxCW0QkSBFHFld9nZuXz/v+bs7BnZ2HN2zpl5fz/nO+f1+mHP9qDh+/1+vs/HPAa0bcARBdqA9QaI8gZeCjbwUrCBl4INvBRs4KVg6wrvhzk7dz7vK3M3Oe19yXH/pzxf8b7k+KT3Jaeme4H33ZydOZ/3lbmbaHhf8uyk9yUna96X/GDc+5JTVfCqA68o8OoDryjw6gOvKPDqA68o8OoDryjw6gOvKPDqA68o8OoDryjw6gOvKPDqA68o8OoDryjw6gOvKPDqA68o8OoDryjw6gOvKPDqA68o8Or64cX5Whq84O0u8IoDry7wigOvLvCKA68u8IoDry7wigOvLvCKA68u8IoDry7wigOvLvCK6whvbdVY8+uLq1fe97Zzh9YM76i0H+BNDrziOsG7d+OtTbwnhk5Vn9joJpYcq20diR/gTQm84jrB+/qBoSbeI7udO77UjW527vCG+AHelMArrrPPvIvHZh6VB3e7Pbuab8Ir4odz7y1btuzpat7quV+Ze0Xnbal58Ppaut7wtVK7mv+7bNQ7x7t/1aO1ltrl8cO5sa1bt758PmdTtbyvzF214W2pefD6Wrrm75Rxlar3JWsd4208dM/x5rejW5qfINbHDz42pMTHBnGdf2w4dHct+nZ86cnG9pH4Ad6UwCuuc7yP3zY0NLTMuYPr1u6stB/gTQ684viHFLrAKw68usArDry6wCsOvLrAKw68usArDry6wCsOvLrAKw68usArDry6wCsOvLrAKw68usArDry6wCsOvLrAKw68usArDry6wCsOvLrAKw68usArDry6wCsOvLrAKw68usArDry6wCsOvLrAKw68usArDry6wCsOvLrAKw68usArDry6wCsOvLrAKw68usArDry6wCsOvLrAKw68usArDry6wCsOvLrAKw68usArDry6wCsOvLrAKw68usArDry6wCsOvLrAKw68usArDry6wCsOvLrAKw68usArDry6wCsOvLrAKw68usArDry6wCsOvLrAKw68usArDry6wCuuN3inclap5X1l7qoNb0vNg9fX0jV/p4ybrnpfsl7nnVcV77zi+NjQo+aRCl5x4O1R4AWvPPCKAq8+8IoCrz7wigKvPvCKAq8+8IoCrz5bvL48gxe8GQIveOWBVxR49YFXFHj1gVcUePWBVxR49YFXFHj1gVcUePWBVxR49YFXFHj1gVcUePWBVxR49YFXFHj1gVcUePUVDq/EM3jBmyHwglceeEWBVx94RYFXH3hFgVcfeEWBVx94RYFXH3hFgVcfeEWBVx94RYFXH3hFgVcfeEWBVx94RYFXH3hFgVcfeEWBVx94RYFXH3hFgVcfeEWBVx94RYFXH3hFgVcfeEWBVx94RYFXH3hFgVcfeEWBVx94RYFXH3hFgVcfeEWBVx94RYFXXy/w9hIqePOXAe+fh5ff/75zh9YM76i0H+AFb6tC4z2x+HRt1y43seRYbetI/AAveGcrNN5373i7suMPbnSzc4c3xA/w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" /></p>
+<!-- rnb-plot-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<p>The Central Limit Theorem (CLT) tells us that the sum <span class="math inline">\(S\)</span> is approximated by a normal distribution. Using the formulas above, we know that the expected value and standard error are:</p>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxubiAqICgyMC0xOCkvMzhcblxuYGBgIn0= -->
+<pre class="r"><code>n * (20-18)/38
+</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiWzFdIDUyLjYzMTU4XG4ifQ== -->
+<pre><code>[1] 52.63158</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuc3FydChuKSAqIDIgKiBzcXJ0KDkwKSAvIDE5XG5cbmBgYCJ9 -->
+<pre class="r"><code>sqrt(n) * 2 * sqrt(90) / 19
+</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiWzFdIDMxLjU3ODk1XG4ifQ== -->
+<pre><code>[1] 31.57895</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<p>The theoretical values above match those obtained with the Monte Carlo simulation:</p>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxubWVhbihTKVxuXG5gYGAifQ== -->
+<pre class="r"><code>mean(S)
+</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiWzFdIDUzLjAyXG4ifQ== -->
+<pre><code>[1] 53.02</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuc2QoUylcblxuYGBgIn0= -->
+<pre class="r"><code>sd(S)
+</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiWzFdIDMxLjI2NTAzXG4ifQ== -->
+<pre><code>[1] 31.26503</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<p>Using the CLT, we can skip the Monte Carlo simulation and instead compute the probability of the casino losing money using this approximation:</p>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxucG5vcm0oMCwgbXUsIHNlKVxuXG5gYGAifQ== -->
+<pre class="r"><code>pnorm(0, mu, se)
+</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiWzFdIDAuMDQ3NzkwMzVcbiJ9 -->
+<pre><code>[1] 0.04779035</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<p>which is also in very good agreement with our Monte Carlo result:</p>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxubWVhbihTPDApXG5cbmBgYCJ9 -->
+<pre class="r"><code>mean(S&lt;0)
+</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiWzFdIDAuMDQxMlxuIn0= -->
+<pre><code>[1] 0.0412</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<div id="how-large-is-large-in-the-central-limit-theorem" class="section level2">
+<h2>14.7.1 How large is large in the Central Limit Theorem?</h2>
+<blockquote>
+<p>“n&gt;=30”</p>
+</blockquote>
+<p>The CLT works when the number of draws is large. But large is a relative term. In many circumstances as few as <strong>30 draws</strong> is enough to make the CLT useful. In some specific instances, as few as 10 is enough. However, these should not be considered general rules. Note, for example, that when the probability of success is very small, we need much larger sample sizes.</p>
+<p>By way of illustration, let’s consider the lottery. In the lottery, the chances of winning are less than 1 in a million. Thousands of people play so the number of draws is very large. Yet the number of winners, the sum of the draws, range between 0 and 4. This sum is certainly not well approximated by a normal distribution, so the CLT does not apply, even with the very large sample size. This is generally true when the probability of a success is very low. In these cases, the Poisson distribution is more appropriate.</p>
+<p>You can examine the properties of the Poisson distribution using dpois and ppois. You can generate random variables following this distribution with rpois. However, we do not cover the theory here. You can learn about the Poisson distribution in any probability textbook and even Wikipedia.</p>
+<hr />
+</div>
+</div>
+<div id="statistical-properties-of-averages" class="section level1">
+<h1><strong>14.8. Statistical properties of averages</strong></h1>
+<p>There are several useful mathematical results that we used above and often employ when working with data. We list them below.</p>
+<ol style="list-style-type: decimal">
+<li>The expected value of the sum of random variables is the sum of each random variable’s expected value. We can write it like this:</li>
+</ol>
+<p><span class="math display">\[
+E[X_1+X_2+...+X_n] = E[X_1]+E[X_2]+...+E[X_n]
+\]</span></p>
+<p>If the <span class="math inline">\(X\)</span> are independent draws from the urn, then they all have the same expected value. Let’s call it<br />
+<span class="math inline">\(μ\)</span> and thus:</p>
+<p><span class="math display">\[
+E[X_1+X_2+...+X_n] = n\mu
+\]</span></p>
+<p>which is another way of writing the result we show above for the sum of draws.</p>
+<ol start="2" style="list-style-type: decimal">
+<li>The expected value of a non-random constant times a random variable is the non-random constant times the expected value of a random variable. This is easier to explain with symbols:</li>
+</ol>
+<p><span class="math display">\[
+E[aX]=a \times E[X]
+\]</span></p>
+<p>To see why this is intuitive, consider change of units. If we change the units of a random variable, say from dollars to cents, the expectation should change in the same way. A consequence of the above two facts is that the expected value of the average of independent draws from the same urn is the expected value of the urn, call it <span class="math inline">\(μ\)</span> again:</p>
+<p><span class="math display">\[
+E[(X_1+X_2+...+X_n)/n]=E[X_1+X_2+...+X_n]/n = n\mu=\mu
+\]</span></p>
+<ol start="3" style="list-style-type: decimal">
+<li>The square of the standard error of the sum of <strong>independent</strong> random variables is the sum of the square of the standard error of each random variable. This one is easier to understand in math form:</li>
+</ol>
+<p><span class="math display">\[
+SE[X_1+X_2+...+X_n] = \sqrt{SE[X_1]^2+SE[X_2]^2+...+SE[X_n]^2}
+\]</span></p>
+<p>The square of the standard error is referred to as the <strong>variance</strong> in statistical textbooks. Note that this particular property is not as intuitive as the previous three and more in depth explanations can be found in statistics textbooks.</p>
+<ol start="4" style="list-style-type: decimal">
+<li>The standard error of a non-random constant times a random variable is the non-random constant times the random variable’s standard error. As with the expectation:</li>
+</ol>
+<p><span class="math display">\[
+SE[aX]=a\times[X]
+\]</span></p>
+<p>To see why this is intuitive, again think of units.</p>
+<p>A consequence of 3 and 4 is that the standard error of the average of independent draws from the same urn is the standard deviation of the urn divided by the square root of<br />
+<span class="math inline">\(n\)</span> (the number of draws), call it<span class="math inline">\(σ\)</span> :</p>
+<p><span class="math display">\[
+SE[(X_1+X_2+...+X_n)/n]=SE[X_1+X_2+...+X_n] \\
+=\sqrt{SE[X_1]^2+SE[X_2]^2+...+SE[X_n]^2}/n \\
+=\sqrt{\sigma^2+\sigma^2+...\sigma^2}/n \\
+=\sqrt{n\sigma^2}/n \\
+=\sigma/\sqrt{n}
+\]</span></p>
+<ol start="5" style="list-style-type: decimal">
+<li>If <span class="math inline">\(X\)</span> is a normally distributed random variable, then if <span class="math inline">\(a\)</span> and <span class="math inline">\(b\)</span> are non-random constants, <span class="math inline">\(aX+b\)</span> is also a normally distributed random variable. All we are doing is changing the units of the random variable by multiplying by <span class="math inline">\(a\)</span> , then shifting the center by <span class="math inline">\(b\)</span>.</li>
+</ol>
+<p><span class="math display">\[
+a \sim N\\
+b \sim N\\
+=&gt; (aX+b) \sim N
+\]</span> Note that statistical textbooks use the Greek letters <span class="math inline">\(μ\)</span> and <span class="math inline">\(σ\)</span> to denote the expected value and standard error, respectively. This is because <span class="math inline">\(μ\)</span> is the Greek letter for <span class="math inline">\(m\)</span> , the first letter of mean, which is another term used for expected value. Similarly, <span class="math inline">\(σ\)</span> is the Greek letter for <span class="math inline">\(s\)</span> , the first letter of standard error.</p>
+</div>
+<div id="law-of-large-numbers" class="section level1">
+<h1><strong>14.9 Law of large numbers</strong></h1>
+<ul>
+<li>표본의 크기가 커지만 SEM이 적어진다.</li>
+</ul>
+<p>An important implication of the final result is that the standard error of the average becomes smaller and smaller as <span class="math inline">\(n\)</span> grows larger. When <span class="math inline">\(n\)</span> is very large, then the standard error is practically 0 and the average of the draws converges to the average of the urn. This is known in statistical textbooks as the law of large numbers or the law of averages.</p>
+<div id="misinterpreting-law-of-averages" class="section level2">
+<h2>14.9.1 Misinterpreting law of averages</h2>
+<ul>
+<li>큰 수의 법칙을 통하여 현상을 해석할 때에는 각 시행이 독립시행이라는 점을 유의해야 한다.</li>
+</ul>
+<p>The law of averages is sometimes misinterpreted. For example, if you toss a coin 5 times and see a head each time, you might hear someone argue that the next toss is probably a tail because of the law of averages: on average we should see 50% heads and 50% tails. A similar argument would be to say that red “is due” on the roulette wheel after seeing black come up five times in a row. These events are independent so the chance of a coin landing heads is 50% regardless of the previous 5. This is also the case for the roulette outcome. The law of averages applies only when the number of draws is very large and not in small samples. After a million tosses, you will definitely see about 50% heads regardless of the outcome of the first five tosses.</p>
+<p>Another funny misuse of the law of averages is in sports when TV sportscasters predict a player is about to succeed because they have failed a few times in a row.</p>
+</div>
+</div>
+<div id="exercises" class="section level1">
+<h1><strong>14.10 Exercises</strong></h1>
+<ol style="list-style-type: decimal">
+<li>In American Roulette you can also bet on green. There are 18 reds, 18 blacks and 2 greens (0 and 00). What are the chances the green comes out?</li>
+</ol>
+<blockquote>
+<p>1/20</p>
+</blockquote>
+<ol start="2" style="list-style-type: decimal">
+<li>The payout for winning on green is $17 dollars. This means that if you bet a dollar and it lands on green, you get $17. Create a sampling model using sample to simulate the random variable <span class="math inline">\(X\)</span> for your winnings. Hint: see the example below for how it should look like when betting on red.</li>
+</ol>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxueCA8LSBzYW1wbGUoYygxLC0xKSwgMSwgcHJvYiA9IGMoOS8xOSwgMTAvMTkpKVxuYGBgIn0= -->
+<pre class="r"><code>x &lt;- sample(c(1,-1), 1, prob = c(9/19, 10/19))</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<blockquote>
+
+</blockquote>
+<ol start="3" style="list-style-type: decimal">
+<li><p>Compute the expected value of <span class="math inline">\(X\)</span>.</p></li>
+<li><p>Compute the standard error of <span class="math inline">\(X\)</span>.</p></li>
+<li><p>Now create a random variable <span class="math inline">\(S\)</span> that is the sum of your winnings after betting on green 1000 times. Hint: change the argument size and replace in your answer to question 2. Start your code by setting the seed to 1 with set.seed(1).</p></li>
+<li><p>What is the expected value of <span class="math inline">\(S\)</span> ?</p></li>
+<li><p>What is the standard error of <span class="math inline">\(S\)</span> ?</p></li>
+<li><p>What is the probability that you end up winning money? Hint: use the CLT.</p></li>
+<li><p>Create a Monte Carlo simulation that generates 1,000 outcomes of <span class="math inline">\(S\)</span> . Compute the average and standard deviation of the resulting list to confirm the results of 6 and 7. Start your code by setting the seed to 1 with set.seed(1).</p></li>
+<li><p>Now check your answer to 8 using the Monte Carlo result.</p></li>
+<li><p>The Monte Carlo result and the CLT approximation are close, but not that close. What could account for this?</p></li>
+</ol>
+<ol style="list-style-type: lower-alpha">
+<li>1,000 simulations is not enough. If we do more, they match.</li>
+<li>The CLT does not work as well when the probability of success is small. In this case, it was 1/19. If we make the number of roulette plays bigger, they will match better.</li>
+<li>The difference is within rounding error.</li>
+<li>The CLT only works for averages.</li>
+</ol>
+<ol start="12" style="list-style-type: decimal">
+<li><p>Now create a random variable <span class="math inline">\(Y\)</span> that is your average winnings per bet after playing off your winnings after betting on green 1,000 times.</p></li>
+<li><p>What is the expected value of <span class="math inline">\(Y\)</span> ?</p></li>
+<li><p>What is the standard error of <span class="math inline">\(Y\)</span> ?</p></li>
+<li><p>What is the probability that you end up with winnings per game that are positive? Hint: use the CLT.</p></li>
+<li><p>Create a Monte Carlo simulation that generates 2,500 outcomes of <span class="math inline">\(Y\)</span> . Compute the average and standard deviation of the resulting list to confirm the results of 6 and 7. Start your code by setting the seed to 1 with set.seed(1).</p></li>
+<li><p>Now check your answer to 8 using the Monte Carlo result.</p></li>
+<li><p>The Monte Carlo result and the CLT approximation are now much closer. What could account for this?</p></li>
+</ol>
+<p>A. We are now computing averages instead of sums. B. 2,500 Monte Carlo simulations is not better than 1,000. C. The CLT works better when the sample size is larger. We increased from 1,000 to 2,500. D. It is not closer. The difference is within rounding error.</p>
+</div>
+<div id="case-studythe-big-short" class="section level1">
+<h1><strong>14.11 Case study:The Big Short</strong></h1>
+<div id="interest-rates-explained-with-chance-model" class="section level2">
+<h2>14.11.1 Interest rates explained with chance model</h2>
+<p>More complex versions of the sampling models we have discussed are also used by banks to decide interest rates. Suppose you run a small bank that has a history of identifying potential homeowners that can be trusted to make payments. In fact, historically, in a given year, only 2% of your customers default, meaning that they don’t pay back the money that you lent them. However, you are aware that if you simply loan money to everybody without interest, you will end up losing money due to this 2%. Although you know 2% of your clients will probably default, you don’t know which ones. Yet by charging everybody just a bit extra in interest, you can make up the losses incurred due to that 2% and also cover your operating costs. You can also make a profit, but if you set the interest rates too high, your clients will go to another bank. We use all these facts and some probability theory to decide what interest rate you should charge.</p>
+<p>Suppose your bank will give out 1,000 loans for $180,000 this year. Also, after adding up all costs, suppose your bank loses $200,000 per foreclosure. For simplicity, we assume this includes all operational costs. A sampling model for this scenario can be coded like this:</p>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxubiA8LSAxMDAwXG5sb3NzX3Blcl9mb3JlY2xvc3VyZSA8LSAtMjAwMDAwXG5wIDwtIDAuMDIgI2xvc3NlcyBpbmN1cnJlZCBkdWUgdG8gdGhhdCAyJVxuZGVmYXVsdHMgPC0gc2FtcGxlKGMoMCwxKSwgbiwgcHJvYj1jKDEtcCxwKSwgcmVwbGFjZT1UUlVFKVxuc3VtKGRlZmF1bHRzICogbG9zc19wZXJfZm9yZWNsb3N1cmUpXG5gYGAifQ== -->
+<pre class="r"><code>n &lt;- 1000
+loss_per_foreclosure &lt;- -200000
+p &lt;- 0.02 #losses incurred due to that 2%
+defaults &lt;- sample(c(0,1), n, prob=c(1-p,p), replace=TRUE)
+sum(defaults * loss_per_foreclosure)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<p>Note that the total loss defined by the final sum is a random variable. Every time you run the above code, you get a different answer. We can easily construct a Monte Carlo simulation to get an idea of the distribution of this random variable.</p>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuQiA8LSAxMDAwMFxubG9zc2VzIDwtIHJlcGxpY2F0ZShCLCB7XG4gICAgZGVmYXVsdHMgPC0gc2FtcGxlKCBjKDAsMSksIG4sIHByb2I9YygxLXAsIHApLCByZXBsYWNlID0gVFJVRSkgXG4gIHN1bShkZWZhdWx0cyAqIGxvc3NfcGVyX2ZvcmVjbG9zdXJlKVxufSlcbmBgYCJ9 -->
+<pre class="r"><code>B &lt;- 10000
+losses &lt;- replicate(B, {
+    defaults &lt;- sample( c(0,1), n, prob=c(1-p, p), replace = TRUE) 
+  sum(defaults * loss_per_foreclosure)
+})</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<p>We don’t really need a Monte Carlo simulation though. Using what we have learned, the CLT tells us that because our losses are a sum of independent draws, its distribution is approximately normal with expected value and standard errors given by:</p>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxubioocCpsb3NzX3Blcl9mb3JlY2xvc3VyZSArICgxLXApKjApXG5gYGAifQ== -->
+<pre class="r"><code>n*(p*loss_per_foreclosure + (1-p)*0)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuc3FydChuKSphYnMobG9zc19wZXJfZm9yZWNsb3N1cmUpKnNxcnQocCooMS1wKSlcbmBgYCJ9 -->
+<pre class="r"><code>sqrt(n)*abs(loss_per_foreclosure)*sqrt(p*(1-p))</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<p>We can now set an interest rate to guarantee that, on average, we break even. Basically, we need to add a quantity <span class="math inline">\(x\)</span> to each loan, which in this case are represented by draws, so that the expected value is 0. If we define <span class="math inline">\(l\)</span> to be the loss per foreclosure, we need:</p>
+<p><span class="math display">\[
+lp + x(1-p)=0
+\]</span></p>
+<p>which implies <span class="math inline">\(x\)</span> is</p>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuLSBsb3NzX3Blcl9mb3JlY2xvc3VyZSpwLygxLXApXG5gYGAifQ== -->
+<pre class="r"><code>- loss_per_foreclosure*p/(1-p)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<p>or an interest rate of 0.023.</p>
+<p>However, we still have a problem. Although this interest rate guarantees that on average we break even, there is a 50% chance that we lose money. If our bank loses money, we have to close it down. We therefore need to pick an interest rate that makes it unlikely for this to happen. At the same time, if the interest rate is too high, our clients will go to another bank so we must be willing to take some risks. So let’s say that we want our chances of losing money to be 1 in 100, what does the <span class="math inline">\(x\)</span> quantity need to be now? This one is a bit harder. We want the sum <span class="math inline">\(S\)</span> to have:</p>
+<p><span class="math display">\[
+Pr(S&lt;0)=0.01
+\]</span></p>
+<p>We know that <span class="math inline">\(S\)</span> is appreoximately normal. The expected value of <span class="math inline">\(S\)</span> is</p>
+<p><span class="math display">\[
+E[S]={lp_x(1-p)}n
+\]</span></p>
+<p>with <span class="math inline">\(n\)</span> the number of draws, which in this case represents loans. The standard error is</p>
+<p><span class="math display">\[
+SD[S]=|x-l|\sqrt{np(1-p)}
+\]</span></p>
+<p>Because <span class="math inline">\(x\)</span> is positive and <span class="math inline">\(l\)</span> negative <span class="math inline">\(|x-l|=x-l\)</span>. Note that these are just an appication of the formulas shown earlier, but using more compact symbols.</p>
+<p>Now we are going to use a mathematical “trick” that is very common in statistics. We add and substract the same quantities to both sides of the event <span class="math inline">\(S&lt;0\)</span> so that the probability does not change and we end up with a standard normal random variable on the left, which will then permit us to write down an equation with only <span class="math inline">\(x\)</span> as an unknown. The “trick” is as follow:</p>
+<p>If <span class="math inline">\(Pr(S&lt;0)=0.01\)</span> then</p>
+<p><span class="math display">\[
+Pr(\frac{S-E[S]}{SE[S]} &lt; \frac{-E[S]}{SE[S]})
+\]</span></p>
+<p>And remember <span class="math inline">\(E[S]\)</span> and <span class="math inline">\(SE[S]\)</span> are the expected value and standard error of <span class="math inline">\(S\)</span>, repectively. All we did above was add and divide by the same quantity on both sides. We did this because now the term on the left is a standard normal random variable, which we will rename <span class="math inline">\(Z\)</span> . Now we fill in the blanks with the actual formula for expected value and standard error:</p>
+<p><span class="math display">\[
+Pr(Z&lt;\frac{-\{lp+x(1-p)\}}{(x-l)\sqrt{(np(1-p))}})=0.01
+\]</span></p>
+<p>It may look complicated, but remember that <span class="math inline">\(l\)</span>, <span class="math inline">\(p\)</span> and <span class="math inline">\(n\)</span> are all known amounts, so eventually we will replace them with numbers.</p>
+<p>Now because the Z is a normal random with expected value 0 and standard error 1, it means that the quantity on the right side of the &lt; sign must be equal to:</p>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxucW5vcm0oMC4wMSlcbmBgYCJ9 -->
+<pre class="r"><code>qnorm(0.01)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<p>for the equation to hold true. Remember that <span class="math inline">\(z=\)</span> <code>qnorm(0.01)</code> gives us the value of <span class="math inline">\(z\)</span> for which:</p>
+<p><span class="math display">\[
+Pr(X&lt;=Z)=0.01
+\]</span></p>
+<p>So this means that the right side of the complicated equation must be <span class="math inline">\(z=\)</span> <code>qnorm(0.01)</code>.</p>
+<p><span class="math display">\[
+\frac{-\{lp+x(l-p)\}n}{(x-l)\sqrt{np(1-p)}}=z
+\]</span></p>
+<p>The trick works because we end up with an expression containing <span class="math inline">\(x\)</span> that we know has to be equal to a known quantity <span class="math inline">\(z\)</span> . Solving for <span class="math inline">\(x\)</span> is now simply algebra:</p>
+<p><span class="math display">\[
+x = -l\frac{np-z\sqrt{np(l-p)}}{n(l-p+z\sqrt{np(l-p)})}
+\]</span> which is:</p>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxubCA8LSBsb3NzX3Blcl9mb3JlY2xvc3VyZVxueiA8LSBxbm9ybSgwLjAxKVxueCA8LSAtbCooIG4qcCAtIHoqc3FydChuKnAqKDEtcCkpKS8gKCBuKigxLXApICsgeipzcXJ0KG4qcCooMS1wKSkpXG54XG5gYGAifQ== -->
+<pre class="r"><code>l &lt;- loss_per_foreclosure
+z &lt;- qnorm(0.01)
+x &lt;- -l*( n*p - z*sqrt(n*p*(1-p)))/ ( n*(1-p) + z*sqrt(n*p*(1-p)))
+x</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<p>Our interest rate now goes up to 0.035. This is still a very competitive interest rate. By choosing this interest rate, we now have an expected profit per loan of:</p>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxubG9zc19wZXJfZm9yZWNsb3N1cmUqcCArIHgqKDEtcClcbmBgYCJ9 -->
+<pre class="r"><code>loss_per_foreclosure*p + x*(1-p)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<p>which is a total expected profit of about:</p>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxubioobG9zc19wZXJfZm9yZWNsb3N1cmUqcCArIHgqKDEtcCkpXG5gYGAifQ== -->
+<pre class="r"><code>n*(loss_per_foreclosure*p + x*(1-p))</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<p>dollars!</p>
+<p>We can run a Monte Carlo simulation to double check our theoretical approximations:</p>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuQiA8LSAxMDAwMDBcbnByb2ZpdCA8LSByZXBsaWNhdGUoQiwge1xuICAgIGRyYXdzIDwtIHNhbXBsZSggYyh4LCBsb3NzX3Blcl9mb3JlY2xvc3VyZSksIG4sIFxuICAgICAgICAgICAgICAgICAgICAgICAgcHJvYj1jKDEtcCwgcCksIHJlcGxhY2UgPSBUUlVFKSBcbiAgICBzdW0oZHJhd3MpXG59KVxubWVhbihwcm9maXQpXG5gYGAifQ== -->
+<pre class="r"><code>B &lt;- 100000
+profit &lt;- replicate(B, {
+    draws &lt;- sample( c(x, loss_per_foreclosure), n, 
+                        prob=c(1-p, p), replace = TRUE) 
+    sum(draws)
+})
+mean(profit)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxubWVhbihwcm9maXQ8MClcbmBgYCJ9 -->
+<pre class="r"><code>mean(profit&lt;0)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+</div>
+<div id="the-big-short" class="section level2">
+<h2>14.11.2 The Big short</h2>
+<p>One of your employees points out that since the bank is making 2,124 dollars per loan, the bank should give out more loans! Why just <span class="math inline">\(n\)</span> ? You explain that finding those <span class="math inline">\(n\)</span> clients was hard. You need a group that is predictable and that keeps the chances of defaults low. He then points out that even if the probability of default is higher, as long as our expected value is positive, you can minimize your chances of losses by increasing <span class="math inline">\(n\)</span> and relying on the law of large numbers.</p>
+<p>He claims that even if the default rate is twice as high, say 4%, if we set the rate just a bit higher than this value:</p>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxucCA8LSAwLjA0XG5yIDwtICgtIGxvc3NfcGVyX2ZvcmVjbG9zdXJlKnAvKDEtcCkpIC8gMTgwMDAwXG5yXG5gYGAifQ== -->
+<pre class="r"><code>p &lt;- 0.04
+r &lt;- (- loss_per_foreclosure*p/(1-p)) / 180000
+r</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<p>we will profit. At 5%, we are guaranteed a positive expected value of:</p>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuciA8LSAwLjA1XG54IDwtIHIqMTgwMDAwXG5sb3NzX3Blcl9mb3JlY2xvc3VyZSpwICsgeCAqICgxLXApXG5gYGAifQ== -->
+<pre class="r"><code>r &lt;- 0.05
+x &lt;- r*180000
+loss_per_foreclosure*p + x * (1-p)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<p>and can minimize our chances of losing money by simply increasing <span class="math inline">\(n\)</span> since:</p>
+<p><span class="math display">\[
+Pr(S&lt;0)=Pr(Z&lt;-\frac{E[S]}{SE[S]})
+\]</span></p>
+<p>with <span class="math inline">\(Z\)</span> a standard normal random variable as shown earlier. If we define <span class="math inline">\(μ\)</span> and <span class="math inline">\(σ\)</span> to be the expected value and standard deviation of the urn, respectively (that is of a single loan), using the formulas above we have: <span class="math inline">\(E[S]=n\mu\)</span> and <span class="math inline">\(SE[S]=\sqrt{n}\sigma\)</span>. So if we define <span class="math inline">\(z=\)</span> <code>qnorm(0.01)</code>, we have:</p>
+<p><span class="math display">\[
+-\frac{n\mu}{\sqrt{n}\sigma} = -\frac{\sqrt{n}\mu}{\sigma} = z
+\]</span></p>
+<p>which implies that if we let:</p>
+<p><span class="math display">\[
+n &gt;= z^2\sigma^2/\mu^2
+\]</span></p>
+<p>we are guaranteed to have a probability of less than 0.01. The implication is that, as long as <span class="math inline">\(μ\)</span> is positive, we can find an <span class="math inline">\(n\)</span> that minimizes the probability of a loss. This is a form of the law of large numbers: when <span class="math inline">\(n\)</span> is large, our average earnings per loan converges to the expected earning <span class="math inline">\(μ\)</span> . With <span class="math inline">\(x\)</span> fixed, now we can ask what <span class="math inline">\(n\)</span> do we need for the probability to be 0.01? In our example, if we give out:</p>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxueiA8LSBxbm9ybSgwLjAxKVxubiA8LSBjZWlsaW5nKCh6XjIqKHgtbCleMipwKigxLXApKS8obCpwICsgeCooMS1wKSleMilcbm5cbmBgYCJ9 -->
+<pre class="r"><code>z &lt;- qnorm(0.01)
+n &lt;- ceiling((z^2*(x-l)^2*p*(1-p))/(l*p + x*(1-p))^2)
+n</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<p>loans, the probability of losing is about 0.01 and we are expected to earn a total of</p>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxubioobG9zc19wZXJfZm9yZWNsb3N1cmUqcCArIHggKiAoMS1wKSlcbmBgYCJ9 -->
+<pre class="r"><code>n*(loss_per_foreclosure*p + x * (1-p))</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<p>dollars! We can confirm this with a Monte Carlo simulation:</p>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxucCA8LSAwLjA0XG54IDwtIDAuMDUqMTgwMDAwXG5wcm9maXQgPC0gcmVwbGljYXRlKEIsIHtcbiAgICBkcmF3cyA8LSBzYW1wbGUoIGMoeCwgbG9zc19wZXJfZm9yZWNsb3N1cmUpLCBuLCBcbiAgICAgICAgICAgICAgICAgICAgICAgIHByb2I9YygxLXAsIHApLCByZXBsYWNlID0gVFJVRSkgXG4gICAgc3VtKGRyYXdzKVxufSlcbm1lYW4ocHJvZml0KVxuYGBgIn0= -->
+<pre class="r"><code>p &lt;- 0.04
+x &lt;- 0.05*180000
+profit &lt;- replicate(B, {
+    draws &lt;- sample( c(x, loss_per_foreclosure), n, 
+                        prob=c(1-p, p), replace = TRUE) 
+    sum(draws)
+})
+mean(profit)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<p>This seems like a no brainer. As a result, your colleague decides to leave your bank and start his own high-risk mortgage company. A few months later, your colleague’s bank has gone bankrupt. A book is written and eventually a movie is made relating the mistake your friend, and many others, made. What happened?</p>
+<p>Your colleague’s scheme was mainly based on this mathematical formula:</p>
+<p><span class="math display">\[
+SE[(X_1+X_2+...+X_n)/n]=\sigma/\sqrt{n}
+\]</span></p>
+<p>By making <span class="math inline">\(n\)</span> large, we minimize the standard error of our per-loan profit. However, for this rule to hold, the <span class="math inline">\(X\)</span>s must be independent draws: one person defaulting must be independent of others defaulting. Note that in the case of averaging the same event over and over, an extreme example of events that are not independent, we get a standard error that is <span class="math inline">\(\sqrt{n}\)</span> times bigger:</p>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxucCA8LSAwLjA0XG54IDwtIDAuMDUqMTgwMDAwXG5wcm9maXQgPC0gcmVwbGljYXRlKEIsIHtcbiAgICBuZXdfcCA8LSAwLjA0ICsgc2FtcGxlKHNlcSgtMC4wMSwgMC4wMSwgbGVuZ3RoID0gMTAwKSwgMSlcbiAgICBkcmF3cyA8LSBzYW1wbGUoIGMoeCwgbG9zc19wZXJfZm9yZWNsb3N1cmUpLCBuLCBcbiAgICAgICAgICAgICAgICAgICAgICAgIHByb2I9YygxLW5ld19wLCBuZXdfcCksIHJlcGxhY2UgPSBUUlVFKSBcbiAgICBzdW0oZHJhd3MpXG59KVxuYGBgIn0= -->
+<pre class="r"><code>p &lt;- 0.04
+x &lt;- 0.05*180000
+profit &lt;- replicate(B, {
+    new_p &lt;- 0.04 + sample(seq(-0.01, 0.01, length = 100), 1)
+    draws &lt;- sample( c(x, loss_per_foreclosure), n, 
+                        prob=c(1-new_p, new_p), replace = TRUE) 
+    sum(draws)
+})</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<p>Note that our expected profit is still large:</p>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxubWVhbihwcm9maXQpXG5gYGAifQ== -->
+<pre class="r"><code>mean(profit)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<p>However, the probability of the bank having negative earnings shoots up to:</p>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxubWVhbihwcm9maXQ8MClcbmBgYCJ9 -->
+<pre class="r"><code>mean(profit&lt;0)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<p>Even scarier is that the probability of losing more than 10 million dollars is:</p>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxubWVhbihwcm9maXQgPCAtMTAwMDAwMDApXG5gYGAifQ== -->
+<pre class="r"><code>mean(profit &lt; -10000000)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<p>To understand how this happens look at the distribution:</p>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuZGF0YS5mcmFtZShwcm9maXRfaW5fbWlsbGlvbnM9cHJvZml0LzEwXjYpICU+JSBcbiAgZ2dwbG90KGFlcyhwcm9maXRfaW5fbWlsbGlvbnMpKSArIFxuICBnZW9tX2hpc3RvZ3JhbShjb2xvcj1cImJsYWNrXCIsIGJpbndpZHRoID0gNSlcbmBgYCJ9 -->
+<pre class="r"><code>data.frame(profit_in_millions=profit/10^6) %&gt;% 
+  ggplot(aes(profit_in_millions)) + 
+  geom_histogram(color=&quot;black&quot;, binwidth = 5)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<p>The theory completely breaks down and the random variable has much more variability than expected. The financial meltdown of 2007 was due, among other things, to financial “experts” assuming independence when there was none.</p>
+</div>
+</div>
+<div id="exercise" class="section level1">
+<h1><strong>14.12 Exercise</strong></h1>
+<ol style="list-style-type: decimal">
+<li><p>Create a random variable <span class="math inline">\(S\)</span> with the earnings of your bank if you give out 10,000 loans, the default rate is 0.3, and you lose $200,000 in each foreclosure. Hint: use the code we showed in the previous section, but change the parameters.</p></li>
+<li><p>Run a Monte Carlo simulation with 10,000 outcomes for <span class="math inline">\(S\)</span> . Make a histogram of the results.</p></li>
+<li><p>What is the expected value of <span class="math inline">\(S\)</span> ?</p></li>
+<li><p>What is the standard error of <span class="math inline">\(S\)</span>?</p></li>
+<li><p>Suppose we give out loans for $180,000. What should the interest rate be so that our expected value is 0?</p></li>
+<li><p>(Harder) What should the interest rate be so that the chance of losing money is 1 in 20? In math notation, what should the interest rate be so that <span class="math inline">\(Pr(S&lt;0)=0.05\)</span> ?</p></li>
+<li><p>If the bank wants to minimize the probabilities of losing money, which of the following does not make interest rates go up?</p></li>
+</ol>
+<p>A. A smaller pool of loans. B. A larger probability of default. C. A smaller required probability of losing money. D. The number of Monte Carlo simulations.</p>
 <!-- rnb-text-end -->
 </div>
-</div>
 
-<div id="rmd-source-code">LS0tCnRpdGxlOiAiQ2hhcCAxNC4gUmFuZG9tIHZhcmlhYmxlcyIKb3V0cHV0OiBodG1sX25vdGVib29rCi0tLQoKKiBIb3cgdG8gbWF0aG1hdGljYWxseSBkZXNjcmliZSByYW5kb20gdmFyaWFibGVzLiAKCioqKgojICoqMTQuMSBSYW5kb20gdmFyaWFibGVzKioKCiogUmFuZG9tIHZhcmlhYmVzIDogbnVtZXJpYyBvdXRjb21lcyByZXN1bHRpbmcgZnJvbSByYW5kb20gcHJvY2Vzc2VzLiAKCmBgYHtyfQpiZWFkcyA8LSByZXAoIGMoInJlZCIsICJibHVlIiksIHRpbWVzID0gYygyLDMpKQpYIDwtIGlmZWxzZShzYW1wbGUoYmVhZHMsIDEpID09ICJibHVlIiwgMSwgMCkKYGBgCgpIZXJlIGBYYCBpcyBhIHJhbmRvbSB2YXJpYWJsZSA6IGV2ZXJ5IHRpbWUgd2Ugc2VsZWN0IGEgbmV3IGJlYWQgdGhlIG91dGNvbWUgY2hhbmdlcyByYW5kb21seS4gU2VlIGJlbG93OgoKYGBge3J9CmlmZWxzZShzYW1wbGUoYmVhZHMsIDEpID09ICJibHVlIiwgMSwgMCkKYGBgCgpgYGB7cn0KaWZlbHNlKHNhbXBsZShiZWFkcywgMSkgPT0gImJsdWUiLCAxLCAwKQpgYGAKCmBgYHtyfQppZmVsc2Uoc2FtcGxlKGJlYWRzLCAxKSA9PSAiYmx1ZSIsIDEsIDApCmBgYAoKKioqCgojICoqMTQuMiBTYW1wbGluZyBtb2RlbHMqKgoKcmFuZG9tIHZhcmlhYmxlICRTJCB0aGF0IHdpbGwgcmVwcmVzZW50IHRoZSBjYXNpbm8ncyB0b3RhbCB3aW5uaW5nLiAKCiogY29uc3RydWN0aW5nIHRoZSB1cm4gCgpgYGB7cn0KY29sb3IgPC0gcmVwKGMoIkJsYWNrIiwgIlJlZCIsICJHcmVlbiIpLCBjKDE4LCAxOCwgMikpICNtYWtlIHRoZSByb3VsZXR0ZSB3aGVlbCB3aXRoIDE4IHJlZCwgMTggYmxhY2ssIDIgZ3JlZW4gCmBgYAoKKiBwbGF5aW5nIDEsMDAwIHRpbWVzIGluZGVwZW5kZW50bHk7IHJlZD0iLTEiLCBvdGhlcnM9IisxIgoKYGBge3J9Cm4gPC0gMTAwMCAjcmVwbGljYXRlcwpYIDwtIHNhbXBsZShpZmVsc2UoY29sb3IgPT0gIlJlZCIsIC0xLCAxKSwgbiwgcmVwbGFjZSA9IFRSVUUpClhbMToxMF0KYGBgCgpgYGB7cn0KWCA8LSBzYW1wbGUoYygtMSwgMSksIG4sIHJlcGxhY2UgPSBUUlVFLCBwcm9iID0gYyg5LzE5LCAxMC8xOSkpClggJT4lIGRhdGFfZnJhbWUoKSAlPiUgZ2dwbG90KGFlcyhYKSkgKyBnZW9tX2JhcigpCmBgYAoKV2UgY2FsbCB0aGlzIGEgKipzYW1wbGluZyBtb2RlbCoqIHNpbmNlIHdlIGFyZSBtb2RlbGluZyB0aGUgcmFuZG9tIGJlaGF2aW9yIG9mIHJvdWxldHRlIHdpdGggdGhlIHNhbXBsaW5nIG9mIGRyYXdzIGZyb20gYW4gdXJuLiBUaGUgdG90YWwgd2lubmluZ3MgICRTJCBpcyBzaW1wbHkgdGhlIHN1bSBvZiB0aGVzZSAxLDAwMCBpbmRlcGVuZGVudCBkcmF3czoKCmBgYHtyfQpYIDwtIHNhbXBsZShjKC0xLCAxKSwgbiwgcmVwbGFjZSA9IFRSVUUsIHByb2IgPSBjKDkvMTksIDEwLzE5KSkKUyA8LSBzdW0oWCkKUwpgYGBgCgoqKioKCiMgKioxNC4zIFRoZSBwcm9iYWJpbGl0eSBkaXN0cmlidXRpb24gb2YgYSByYW5kb20gdmFyaWFibGUqKgoKJFMkIGlzIGEgcmFuZG9tIHZhcmlhYmxlID09PiBpdCBjaGFuZ2VzIGV2ZXJ5IHJ1bnMuID09PiAiUHJvYmFiaWxpdHkgZGlzdHJpYnV0aW9uIgoKKiBJZiB3ZSB3YW50IHRvIGtub3cgdGhlIHByb2JhYmlsaXR5IHRoYXQgd2UgbG9zZSBtb25leSwgd2UgYXJlIGFza2luZyB0aGUgcHJvYmFiaWxpdHkgdGhhdCAkUyQgaXMgaW4gdGhlIGludGVydmFsICRTPDAkLgoKKiBFc3RpbWF0ZSB0aGUgZGlzdHJpYnV0aW9uIDogdXNpbmcgTW9udGUgQ2FybG8gc2ltdWxhdGlvbiAKCmBgYHtyfQpuIDwtIDEwMDAgI3RoZSBudW1iZXIgb2YgZ2FtZXMKQiA8LSAxMDAwMCAjdGhlIHJlcGxpY2F0ZXMgb2Ygc2ltdWxhdGlvbgoKcm91bGV0dGVfd2lubmluZ3MgPC0gZnVuY3Rpb24obil7CiAgWCA8LSBzYW1wbGUoYygtMSwxKSwgbiwgcmVwbGFjZT1UUlVFLCBwcm9iPWMoOS8xOSwgMTAvMTkpKQogIHN1bShYKQp9CgpTIDwtIHJlcGxpY2F0ZShCLCByb3VsZXR0ZV93aW5uaW5ncyhuKSkKYGBgCgpgYGB7cn0KbWVhbihTPDApCmBgYAoKCmBgYHtyfQpTICU+JSBkYXRhX2ZyYW1lKCkgJT4lIGdncGxvdChhZXMoUykpICsgZ2VvbV9oaXN0b2dyYW0oKQpgYGAKCiogZGlzdHJpYnV0aW9uIGFwcGVhcnMgdG8gYmUgYXBwcm94aW1hdGVseSBub3JtYWwuCgogICsgZXhwZWN0ZWQgdmFsdWUgOiBhdmVyYWdlIG9mIGFwcHJveGltYXRlZCBub3JtYWwgZGlzdHJpYnV0aW9uIAogIAogICsgc3RhbmRhcmQgZXJyb3IgOiBzdGFuZGFyZCBkZXZpYXRpb24gb2YgYXBwcm94aW1hdGVkIG5vcm1hbCBkaXN0cmlidXRvbgogIAoqIGV4YW1wbGUgYWJvdmUgOiAkKFMrbikvMiQgZm9sbG93cyBhIGJpbm9taWFsIGRpc3RyaWJ1dGlvbiAKCiAgKyAkUHIoUzwwKSA9IFByKFMrbikvMiA8ICgwK24pLzIpJAogIAogICsgY2FuIHVzZSB0aGUgYHBiaW5vbWAgdG8gY29tcHV0ZSBgUHIoUzwwKWAKICAKYGBge3J9Cm4gPC0gMTAwMApwYmlub20obi8yLCBzaXplID0gbiwgcHJvYiA9IDEwLzE5KQpgYGAKCkJlY2F1c2UgdGhpcyBpcyBhIGRpc2NyZXRlIHByb2JhYmlsaXR5IGZ1bmN0aW9uLCB0byBnZXQgJFByKFM8MCkkIHJhdGhlciB0aGFuICRQcihTPD0wKSQsIHdlIHdyaXRlOgoKYGBge3J9CnBiaW5vbShuLzItMSwgc2l6ZT1uLCBwcm9iPTEwLzE5KQpgYGAKCkhlcmUgd2UgZG8gbm90IGNvdmVyIHRoZXNlIGRldGFpbHMuIEluc3RlYWQsIHdlIHdpbGwgZGlzY3VzcyBhbiBpbmNyZWRpYmx5IHVzZWZ1bCBhcHByb3hpbWF0aW9uIHByb3ZpZGVkIGJ5IG1hdGhlbWF0aWNhbCB0aGVvcnkgdGhhdCBhcHBsaWVzIGdlbmVyYWxseSB0byBzdW1zIGFuZCBhdmVyYWdlcyBvZiBkcmF3cyBmcm9tIGFueSB1cm46IHRoZSAqKkNlbnRyYWwgTGltaXQgVGhlb3JlbSAoQ0xUKSoqLgoKKioqCgojICoqMTQuNCBEaXN0cmlidXRpb25zIHZlcnN1cyBwcm9iYWJpbGl0eSBkaXN0cmlidXRpb24qKgoKKiBEaXN0cmlidXRpb24gOiAkeF8xLCB4XzIsIC4uLiwgeF9uJAoKKiBQcm9iYWJpbGl0eSBkaXN0cmlidXRpb24gOiAkRihhKSQgOyB3aGF0IHByb3BvcnRpb24gb2YgdGhlIGxpc3QgaXMgbGVzcyB0aGFuIG9yIGVxdWFsIHRvICRhJCAKCmBgYHtyfQojdG8gc3VtbWFyaXNlIEYoYSkKbSA8LSBzdW0oeCkvbGVuZ3RoKHgpCnMgPC0gc3FydChzdW0ocyAtIG0pXjIgLyBsZW5ndGgoeCkpCmBgYAoKQSByYW5kb20gdmFyaWFibGUgJFgkIGhhcyBhIGRpc3RyaWJ1dGlvbiBmdW5jdGlvbi4gbm90IHJlYWwgbGlzdCwgcmF0aGVyIHRoZW9yZXRpY2FsIGNvbmNlcHQuIAoKKiBXaGF0IGlzIHRoZSBwcm9iYWJpbGl0eSB0aGF0ICRYJCBpcyBsZXNzIHRoYW4gb3IgZXF1YWwgdG8gJGEkPyAkRihhKSQgKG5vdCB0aGUgbGlzdCwgaXQncyBudW1iZXIpCgoqIFVuZGVyIHN0YW5kaW5nICRYJCAobGlzdCwgbm90IHRoZSBudW1iZXIpIDogdG8gcnVuIGEgTW9udGUgQ2FybG8gc2ltdWxhdGlvbiBhbmQgZ2VuZXJhdGUgYSB2ZXJ5IGxhcmdlIGxpc3Qgb2Ygb3V0Y29tZXMgb2YgJFgkLiBUaGVzZSBvdXRjb21lcyBhcmUgYSBsaXN0IG9mIG51bWJlcnMuIAoKCioqKiAKCiMgKioxNC41IE5vdGF0aW9uIGZvciByYW5kb20gdmFyaWFibGVzKioKCkluIHN0YXRpc3RpY2FsIHRleHRib29rcywKCiogdXBwZXIgY2FzZSBsZXR0ZXJzIDogcmFuZG9tIHZhcmlhYmxlcyAKCiogbG93ZXIgY2FzZSBsZXR0ZXJzIDogb2JzZXJ2ZWQgdmFsdWVzIAoKKiAkWDw9eCQKCiAgKyAkWCQgOiByYW5kb20gcXVhbnRpdHkgdGhhdCB3ZSB3aWxsIHNlZSBpbiB0aGUgZnV0dXJlIChub3QgYW4gb2JzZXJ2ZWQgcXVhbnRpdHkpCiAgCiAgKyAkeCQgOiBvYmVydmVkIHZhbHVlIAoKKioqCgojICoqMTQuNiBUaGUgZXhwZWN0ZWQgdmFsdWUgYW5kIHN0YW5kYXJkIGVycm9yKioKCiogJEVbWF0kIDogZXhwZWN0ZWQgdmFsdWUgb2YgcmFuZG9tIHZhcmlhYmxlICRYJC4KCiAgLSBkZWZpbml0aW9uIDogb25lIGRyYXcgaXMgdGhlIGF2ZXJhZ2Ugb2YgdGhlIG51bWJlcnMgaW4gdGhlIHVybiAKICAKICAtIGdlbmVyYWwgZm9ybXVsYSA6ICRFKFgpID0gYXAgKyBiKDEtcCkkICh0d28gcG9zc2libGUgb3V0Y29tZSAkYSwgYiQgd2l0aCBwcm9wb3J0aW9ucyAkcCQgYW5kICQxLXAkLCBmb3IgYmlub21lYWwpCiAgCmBgYHtyfQpCIDwtIDEwXjYKeCA8LSBzYW1wbGUoYygtMSwgMSksIEIsIHJlcGxhY2UgPSBUUlVFLCBwcm9iID0gYyg5LzE5LCAxMC8xOSkpCm1lYW4oeCkKYGBgCgoqICRTRShYKSQgOiBzdGFuZGFyZCBlcnJvciBvZiBhIHJhbmRvbSB2YXJpYWJsZSAkWCQgCgogIC0gZGVmaW5pdGlvbiA6IHN0YW5kYXJkIGRldmlhdGlvbiBvZiB0aGUgc2FtcGxpbmcgZGlzdHJpYnV0aW9uICAKICAKICAtIGdlbmVyYWwgZm9ybXVsYSA6ICR8Yi1hfFxzcXJ0e3AoMS1wKX0kCgpgYGB7cn0KMiAqIHNxcnQoOTApLzE5CmBgYAoKYGBge3J9Cm4gPC0gMTAwMApzcXJ0KG4pICogMiAqIHNxcnQoOTApLzE5CmBgYAoKKipBZHZhbmNlZCBub3RlKio6IEJlZm9yZSBjb250aW51aW5nIHdlIHNob3VsZCBwb2ludCBvdXQgdGhhdCBleGFjdCBwcm9iYWJpbGl0eSBjYWxjdWxhdGlvbnMgZm9yIHRoZSBjYXNpbm8gd2lubmluZ3MgY2FuIGJlIHBlcmZvcm1lZCB3aXRoIHRoZSBiaW5vbWlhbCBkaXN0cmlidXRpb24uIEhvd2V2ZXIsIGhlcmUgd2UgZm9jdXMgb24gdGhlIENMVCwgd2hpY2ggY2FuIGJlIGdlbmVyYWxseSBhcHBsaWVkIHRvIHN1bXMgb2YgcmFuZG9tIHZhcmlhYmxlcyBpbiBhIHdheSB0aGF0IHRoZSBiaW5vbWlhbCBkaXN0cmlidXRpb24gY2Fu4oCZdC4KCiMjIDE0LjYuMSBQb3B1bGF0aW9uIFNEIHZlcnN1cyB0aGUgc2FtcGxlIFNEIAoKYGBge3J9CmxpYnJhcnkoZHNsYWJzKQp4IDwtIGhlaWdodHMkaGVpZ2h0Cm0gPC0gbWVhbih4KQpzIDwtIHNxcnQobWVhbigoeC1tKV4yKSkKYGBgCgoKKiBhdmVyYWdlCgokJApcbXUgPSBcZnJhY3sxfXtufSBcc3VtX3tpPTF9Xm4geF9pCiQkCgoqIHN0YW5kYXJkIGRldmlhdGlvbgoKJCQKXHNpZ21hID0gXHNxcnR7XGZyYWN7MX17bn0gXHN1bV97aT0xfV5uICh4X2kgLSBcbXUpXjJ9CiQkCgpIb3dldmVyLCBiZSBhd2FyZSB0aGF0IHRoZSBgc2RgIGZ1bmN0aW9uIHJldHVybnMgYSBzbGlnaHRseSBkaWZmZXJlbnQgcmVzdWx0OgoKYGBge3J9CmlkZW50aWNhbChzLCBzZCh4KSkKYGBgCgpgYGB7cn0KcyAtIHNkKHgpCmBgYAoKKiBgc2AgaXMgZm9yIHBvcHVsYXRpb24uCgokJApcc2lnbWEgPSBcc3FydHtcZnJhY3sxfXtufSBcc3VtX3tpPTF9Xm4gKHhfaSAtIFxtdSleMn0gXFwoPXMpCiQkCgoqIGBzZCh4KWAgaXMgZm9yIHNhbXBsZXMuCgokJApzZCh4KSA9IFxzcXJ0e1xmcmFjezF9e04tMX0gXHN1bV97aT0xfV5OIChYX2kgLSBcYmFye1h9KV4yfQokJAoKYGBge3J9Cm4gPC0gbGVuZ3RoKHgpCnMtc2QoeCkqc3FydCgobi0xKS9uKQpgYGAKClRocm91Z2hvdXQgdGhpcyBib29rLCBhc3N1bWluZyAkXHNxcnR7KE4tMSkvTn0gXGFwcHJveCAxJCB0byB1c2UgYHNkKHgpYCBmdW5jdGlvbi4gCg==</div>
+<div id="rmd-source-code">LS0tCnRpdGxlOiAiQ2hhcCAxNC4gUmFuZG9tIHZhcmlhYmxlcyIKb3V0cHV0OiBodG1sX25vdGVib29rCi0tLQoKKiBIb3cgdG8gbWF0aG1hdGljYWxseSBkZXNjcmliZSByYW5kb20gdmFyaWFibGVzLiAKCioqKgojICoqMTQuMSBSYW5kb20gdmFyaWFibGVzKioKCiogUmFuZG9tIHZhcmlhYmVzIDogbnVtZXJpYyBvdXRjb21lcyByZXN1bHRpbmcgZnJvbSByYW5kb20gcHJvY2Vzc2VzLiAKCmBgYHtyfQpiZWFkcyA8LSByZXAoIGMoInJlZCIsICJibHVlIiksIHRpbWVzID0gYygyLDMpKQpYIDwtIGlmZWxzZShzYW1wbGUoYmVhZHMsIDEpID09ICJibHVlIiwgMSwgMCkKYGBgCgpIZXJlIGBYYCBpcyBhIHJhbmRvbSB2YXJpYWJsZSA6IGV2ZXJ5IHRpbWUgd2Ugc2VsZWN0IGEgbmV3IGJlYWQgdGhlIG91dGNvbWUgY2hhbmdlcyByYW5kb21seS4gU2VlIGJlbG93OgoKYGBge3J9CmlmZWxzZShzYW1wbGUoYmVhZHMsIDEpID09ICJibHVlIiwgMSwgMCkKYGBgCgpgYGB7cn0KaWZlbHNlKHNhbXBsZShiZWFkcywgMSkgPT0gImJsdWUiLCAxLCAwKQpgYGAKCmBgYHtyfQppZmVsc2Uoc2FtcGxlKGJlYWRzLCAxKSA9PSAiYmx1ZSIsIDEsIDApCmBgYAoKKioqCgojICoqMTQuMiBTYW1wbGluZyBtb2RlbHMqKgoKcmFuZG9tIHZhcmlhYmxlICRTJCB0aGF0IHdpbGwgcmVwcmVzZW50IHRoZSBjYXNpbm8ncyB0b3RhbCB3aW5uaW5nLiAKCiogY29uc3RydWN0aW5nIHRoZSB1cm4gCgpgYGB7cn0KY29sb3IgPC0gcmVwKGMoIkJsYWNrIiwgIlJlZCIsICJHcmVlbiIpLCBjKDE4LCAxOCwgMikpICNtYWtlIHRoZSByb3VsZXR0ZSB3aGVlbCB3aXRoIDE4IHJlZCwgMTggYmxhY2ssIDIgZ3JlZW4gCmBgYAoKKiBwbGF5aW5nIDEsMDAwIHRpbWVzIGluZGVwZW5kZW50bHk7IHJlZD0iLTEiLCBvdGhlcnM9IisxIgoKYGBge3J9Cm4gPC0gMTAwMCAjcmVwbGljYXRlcwpYIDwtIHNhbXBsZShpZmVsc2UoY29sb3IgPT0gIlJlZCIsIC0xLCAxKSwgbiwgcmVwbGFjZSA9IFRSVUUpClhbMToxMF0KYGBgCgpgYGB7cn0KWCA8LSBzYW1wbGUoYygtMSwgMSksIG4sIHJlcGxhY2UgPSBUUlVFLCBwcm9iID0gYyg5LzE5LCAxMC8xOSkpClggJT4lIGRhdGFfZnJhbWUoKSAlPiUgZ2dwbG90KGFlcyhYKSkgKyBnZW9tX2JhcigpCmBgYAoKV2UgY2FsbCB0aGlzIGEgKipzYW1wbGluZyBtb2RlbCoqIHNpbmNlIHdlIGFyZSBtb2RlbGluZyB0aGUgcmFuZG9tIGJlaGF2aW9yIG9mIHJvdWxldHRlIHdpdGggdGhlIHNhbXBsaW5nIG9mIGRyYXdzIGZyb20gYW4gdXJuLiBUaGUgdG90YWwgd2lubmluZ3MgICRTJCBpcyBzaW1wbHkgdGhlIHN1bSBvZiB0aGVzZSAxLDAwMCBpbmRlcGVuZGVudCBkcmF3czoKCmBgYHtyfQpYIDwtIHNhbXBsZShjKC0xLCAxKSwgbiwgcmVwbGFjZSA9IFRSVUUsIHByb2IgPSBjKDkvMTksIDEwLzE5KSkKUyA8LSBzdW0oWCkKUwpgYGBgCgoqKioKCiMgKioxNC4zIFRoZSBwcm9iYWJpbGl0eSBkaXN0cmlidXRpb24gb2YgYSByYW5kb20gdmFyaWFibGUqKgoKJFMkIGlzIGEgcmFuZG9tIHZhcmlhYmxlID09PiBpdCBjaGFuZ2VzIGV2ZXJ5IHJ1bnMuID09PiAiUHJvYmFiaWxpdHkgZGlzdHJpYnV0aW9uIgoKKiBJZiB3ZSB3YW50IHRvIGtub3cgdGhlIHByb2JhYmlsaXR5IHRoYXQgd2UgbG9zZSBtb25leSwgd2UgYXJlIGFza2luZyB0aGUgcHJvYmFiaWxpdHkgdGhhdCAkUyQgaXMgaW4gdGhlIGludGVydmFsICRTPDAkLgoKKiBFc3RpbWF0ZSB0aGUgZGlzdHJpYnV0aW9uIDogdXNpbmcgTW9udGUgQ2FybG8gc2ltdWxhdGlvbiAKCmBgYHtyfQpuIDwtIDEwMDAgI3RoZSBudW1iZXIgb2YgZ2FtZXMKQiA8LSAxMDAwMCAjdGhlIHJlcGxpY2F0ZXMgb2Ygc2ltdWxhdGlvbgoKcm91bGV0dGVfd2lubmluZ3MgPC0gZnVuY3Rpb24obil7CiAgWCA8LSBzYW1wbGUoYygtMSwxKSwgbiwgcmVwbGFjZT1UUlVFLCBwcm9iPWMoOS8xOSwgMTAvMTkpKQogIHN1bShYKQp9CgpTIDwtIHJlcGxpY2F0ZShCLCByb3VsZXR0ZV93aW5uaW5ncyhuKSkKYGBgCgpgYGB7cn0KbWVhbihTPDApCmBgYAoKCmBgYHtyfQpTICU+JSBkYXRhX2ZyYW1lKCkgJT4lIGdncGxvdChhZXMoUykpICsgZ2VvbV9oaXN0b2dyYW0oKQpgYGAKCiogZGlzdHJpYnV0aW9uIGFwcGVhcnMgdG8gYmUgYXBwcm94aW1hdGVseSBub3JtYWwuCgogICsgZXhwZWN0ZWQgdmFsdWUgOiBhdmVyYWdlIG9mIGFwcHJveGltYXRlZCBub3JtYWwgZGlzdHJpYnV0aW9uIAogIAogICsgc3RhbmRhcmQgZXJyb3IgOiBzdGFuZGFyZCBkZXZpYXRpb24gb2YgYXBwcm94aW1hdGVkIG5vcm1hbCBkaXN0cmlidXRvbgogIAoqIGV4YW1wbGUgYWJvdmUgOiAkKFMrbikvMiQgZm9sbG93cyBhIGJpbm9taWFsIGRpc3RyaWJ1dGlvbiAKCiAgKyAkUHIoUzwwKSA9IFByKFMrbikvMiA8ICgwK24pLzIpJAogIAogICsgY2FuIHVzZSB0aGUgYHBiaW5vbWAgdG8gY29tcHV0ZSBgUHIoUzwwKWAKICAKYGBge3J9Cm4gPC0gMTAwMApwYmlub20obi8yLCBzaXplID0gbiwgcHJvYiA9IDEwLzE5KQpgYGAKCkJlY2F1c2UgdGhpcyBpcyBhIGRpc2NyZXRlIHByb2JhYmlsaXR5IGZ1bmN0aW9uLCB0byBnZXQgJFByKFM8MCkkIHJhdGhlciB0aGFuICRQcihTPD0wKSQsIHdlIHdyaXRlOgoKYGBge3J9CnBiaW5vbShuLzItMSwgc2l6ZT1uLCBwcm9iPTEwLzE5KQpgYGAKCkhlcmUgd2UgZG8gbm90IGNvdmVyIHRoZXNlIGRldGFpbHMuIEluc3RlYWQsIHdlIHdpbGwgZGlzY3VzcyBhbiBpbmNyZWRpYmx5IHVzZWZ1bCBhcHByb3hpbWF0aW9uIHByb3ZpZGVkIGJ5IG1hdGhlbWF0aWNhbCB0aGVvcnkgdGhhdCBhcHBsaWVzIGdlbmVyYWxseSB0byBzdW1zIGFuZCBhdmVyYWdlcyBvZiBkcmF3cyBmcm9tIGFueSB1cm46IHRoZSAqKkNlbnRyYWwgTGltaXQgVGhlb3JlbSAoQ0xUKSoqLgoKKioqCgojICoqMTQuNCBEaXN0cmlidXRpb25zIHZlcnN1cyBwcm9iYWJpbGl0eSBkaXN0cmlidXRpb24qKgoKKiBEaXN0cmlidXRpb24gOiAkeF8xLCB4XzIsIC4uLiwgeF9uJAoKKiBQcm9iYWJpbGl0eSBkaXN0cmlidXRpb24gOiAkRihhKSQgOyB3aGF0IHByb3BvcnRpb24gb2YgdGhlIGxpc3QgaXMgbGVzcyB0aGFuIG9yIGVxdWFsIHRvICRhJCAKCmBgYHtyfQojdG8gc3VtbWFyaXNlIEYoYSkKbSA8LSBzdW0oeCkvbGVuZ3RoKHgpCnMgPC0gc3FydChzdW0ocyAtIG0pXjIgLyBsZW5ndGgoeCkpCmBgYAoKQSByYW5kb20gdmFyaWFibGUgJFgkIGhhcyBhIGRpc3RyaWJ1dGlvbiBmdW5jdGlvbi4gbm90IHJlYWwgbGlzdCwgcmF0aGVyIHRoZW9yZXRpY2FsIGNvbmNlcHQuIAoKKiBXaGF0IGlzIHRoZSBwcm9iYWJpbGl0eSB0aGF0ICRYJCBpcyBsZXNzIHRoYW4gb3IgZXF1YWwgdG8gJGEkPyAkRihhKSQgKG5vdCB0aGUgbGlzdCwgaXQncyBudW1iZXIpCgoqIFVuZGVyIHN0YW5kaW5nICRYJCAobGlzdCwgbm90IHRoZSBudW1iZXIpIDogdG8gcnVuIGEgTW9udGUgQ2FybG8gc2ltdWxhdGlvbiBhbmQgZ2VuZXJhdGUgYSB2ZXJ5IGxhcmdlIGxpc3Qgb2Ygb3V0Y29tZXMgb2YgJFgkLiBUaGVzZSBvdXRjb21lcyBhcmUgYSBsaXN0IG9mIG51bWJlcnMuIAoKCioqKiAKCiMgKioxNC41IE5vdGF0aW9uIGZvciByYW5kb20gdmFyaWFibGVzKioKCkluIHN0YXRpc3RpY2FsIHRleHRib29rcywKCiogdXBwZXIgY2FzZSBsZXR0ZXJzIDogcmFuZG9tIHZhcmlhYmxlcyAKCiogbG93ZXIgY2FzZSBsZXR0ZXJzIDogb2JzZXJ2ZWQgdmFsdWVzIAoKKiAkWDw9eCQKCiAgKyAkWCQgOiByYW5kb20gcXVhbnRpdHkgdGhhdCB3ZSB3aWxsIHNlZSBpbiB0aGUgZnV0dXJlIChub3QgYW4gb2JzZXJ2ZWQgcXVhbnRpdHkpCiAgCiAgKyAkeCQgOiBvYmVydmVkIHZhbHVlIAoKKioqCgojICoqMTQuNiBUaGUgZXhwZWN0ZWQgdmFsdWUgYW5kIHN0YW5kYXJkIGVycm9yKioKCiogJEVbWF0kIDogZXhwZWN0ZWQgdmFsdWUgb2YgcmFuZG9tIHZhcmlhYmxlICRYJC4KCiAgLSBkZWZpbml0aW9uIDogb25lIGRyYXcgaXMgdGhlIGF2ZXJhZ2Ugb2YgdGhlIG51bWJlcnMgaW4gdGhlIHVybiAKICAKICAtIGdlbmVyYWwgZm9ybXVsYSA6ICRFKFgpID0gYXAgKyBiKDEtcCkkICh0d28gcG9zc2libGUgb3V0Y29tZSAkYSwgYiQgd2l0aCBwcm9wb3J0aW9ucyAkcCQgYW5kICQxLXAkLCBmb3IgYmlub21lYWwpCiAgCmBgYHtyfQpCIDwtIDEwXjYKeCA8LSBzYW1wbGUoYygtMSwgMSksIEIsIHJlcGxhY2UgPSBUUlVFLCBwcm9iID0gYyg5LzE5LCAxMC8xOSkpCm1lYW4oeCkKYGBgCgoqICRTRShYKSQgOiBzdGFuZGFyZCBlcnJvciBvZiBhIHJhbmRvbSB2YXJpYWJsZSAkWCQgCgogIC0gZGVmaW5pdGlvbiA6IHN0YW5kYXJkIGRldmlhdGlvbiBvZiB0aGUgc2FtcGxpbmcgZGlzdHJpYnV0aW9uICAKICAKICAtIGdlbmVyYWwgZm9ybXVsYSA6ICR8Yi1hfFxzcXJ0e3AoMS1wKX0kCgpgYGB7cn0KMiAqIHNxcnQoOTApLzE5CmBgYAoKYGBge3J9Cm4gPC0gMTAwMApzcXJ0KG4pICogMiAqIHNxcnQoOTApLzE5CmBgYAoKKipBZHZhbmNlZCBub3RlKio6IEJlZm9yZSBjb250aW51aW5nIHdlIHNob3VsZCBwb2ludCBvdXQgdGhhdCBleGFjdCBwcm9iYWJpbGl0eSBjYWxjdWxhdGlvbnMgZm9yIHRoZSBjYXNpbm8gd2lubmluZ3MgY2FuIGJlIHBlcmZvcm1lZCB3aXRoIHRoZSBiaW5vbWlhbCBkaXN0cmlidXRpb24uIEhvd2V2ZXIsIGhlcmUgd2UgZm9jdXMgb24gdGhlIENMVCwgd2hpY2ggY2FuIGJlIGdlbmVyYWxseSBhcHBsaWVkIHRvIHN1bXMgb2YgcmFuZG9tIHZhcmlhYmxlcyBpbiBhIHdheSB0aGF0IHRoZSBiaW5vbWlhbCBkaXN0cmlidXRpb24gY2Fu4oCZdC4KCiMjIDE0LjYuMSBQb3B1bGF0aW9uIFNEIHZlcnN1cyB0aGUgc2FtcGxlIFNEIAoKYGBge3J9CmxpYnJhcnkoZHNsYWJzKQp4IDwtIGhlaWdodHMkaGVpZ2h0Cm0gPC0gbWVhbih4KQpzIDwtIHNxcnQobWVhbigoeC1tKV4yKSkKYGBgCgoKKiBhdmVyYWdlCgokJApcbXUgPSBcZnJhY3sxfXtufSBcc3VtX3tpPTF9Xm4geF9pCiQkCgoqIHN0YW5kYXJkIGRldmlhdGlvbgoKJCQKXHNpZ21hID0gXHNxcnR7XGZyYWN7MX17bn0gXHN1bV97aT0xfV5uICh4X2kgLSBcbXUpXjJ9CiQkCgpIb3dldmVyLCBiZSBhd2FyZSB0aGF0IHRoZSBgc2RgIGZ1bmN0aW9uIHJldHVybnMgYSBzbGlnaHRseSBkaWZmZXJlbnQgcmVzdWx0OgoKYGBge3J9CmlkZW50aWNhbChzLCBzZCh4KSkKYGBgCgpgYGB7cn0KcyAtIHNkKHgpCmBgYAoKKiBgc2AgaXMgZm9yIHBvcHVsYXRpb24uCgokJApcc2lnbWEgPSBcc3FydHtcZnJhY3sxfXtufSBcc3VtX3tpPTF9Xm4gKHhfaSAtIFxtdSleMn0gXFwoPXMpCiQkCgoqIGBzZCh4KWAgaXMgZm9yIHNhbXBsZXMuCgokJApzZCh4KSA9IFxzcXJ0e1xmcmFjezF9e04tMX0gXHN1bV97aT0xfV5OIChYX2kgLSBcYmFye1h9KV4yfQokJAoKYGBge3J9Cm4gPC0gbGVuZ3RoKHgpCnMtc2QoeCkqc3FydCgobi0xKS9uKQpgYGAKClRocm91Z2hvdXQgdGhpcyBib29rLCBhc3N1bWluZyAkXHNxcnR7KE4tMSkvTn0gXGFwcHJveCAxJCB0byB1c2UgYHNkKHgpYCBmdW5jdGlvbi4gCgoKKioqCgojICoqMTQuNyBDZW50cmFsIExpbWl0IFRoZW9yZW0qKgoKKiBDTFQgOiBzYW1wbGUgc2l6ZeqwgCDrp6TsmrAg7YGs66m0IOuPheumveyLnO2WieyXkCDrjIDtlZwg7ZmV66Wg67aE7Y+s6rCAIOq3vOyCrOyggeycvOuhnCDsoJXqt5zrtoTtj6zsl5Ag64uk6rCA6rCE64uk64qUIOydtOuhoCAKCiAgLSDqt7jroIfqsowg65Cc64uk66m0LCDtmZXrpaDrtoTtj6zrpbwg64KY7YOA64K06riwIOychO2VmOyXrCDtlYTsmpTtlZwg6rKD7J2AIGF2ZXJhZ2XsmYAgc3RhbmRhcmQgZGV2aWF0aW9u7J2066m0IOy2qeu2hC4gCiAgCiAgLSDrj4Xrpr3si5ztlonsnbQgQmlvbm9tZWFsIOydmCDqsr3smrDrp4wg6re465+s7ZWc6rCAPyDrqqjrk6Ag6rK97Jqw7JeQIOq3uOufrO2VnOqwgD8gCgpUaGUgKipDZW50cmFsIExpbWl0IFRoZW9yZW0gKENMVCkqKiB0ZWxscyB1cyB0aGF0IF93aGVuIHRoZSBudW1iZXIgb2YgZHJhd3MsIGFsc28gY2FsbGVkIHRoZSBzYW1wbGUgc2l6ZSwgaXMgbGFyZ2UsIHRoZSBwcm9iYWJpbGl0eSBkaXN0cmlidXRpb24gb2YgdGhlIHN1bSBvZiB0aGUgaW5kZXBlbmRlbnQgZHJhd3MgaXMgYXBwcm94aW1hdGVseSBub3JtYWwuXyBCZWNhdXNlIHNhbXBsaW5nIG1vZGVscyBhcmUgdXNlZCBmb3Igc28gbWFueSBkYXRhIGdlbmVyYXRpb24gcHJvY2Vzc2VzLCB0aGUgQ0xUIGlzIGNvbnNpZGVyZWQgb25lIG9mIHRoZSBtb3N0IGltcG9ydGFudCBtYXRoZW1hdGljYWwgaW5zaWdodHMgaW4gaGlzdG9yeS4KClByZXZpb3VzbHksIHdlIGRpc2N1c3NlZCB0aGF0IGlmIHdlIGtub3cgdGhhdCB0aGUgZGlzdHJpYnV0aW9uIG9mIGEgbGlzdCBvZiBudW1iZXJzIGlzIGFwcHJveGltYXRlZCBieSB0aGUgbm9ybWFsIGRpc3RyaWJ1dGlvbiwgYWxsIHdlIG5lZWQgdG8gZGVzY3JpYmUgdGhlIGxpc3QgYXJlIHRoZSBfYXZlcmFnZV8gYW5kIF9zdGFuZGFyZCBkZXZpYXRpb24uXyBXZSBhbHNvIGtub3cgdGhhdCB0aGUgc2FtZSBhcHBsaWVzIHRvIHByb2JhYmlsaXR5IGRpc3RyaWJ1dGlvbnMuIElmIGEgcmFuZG9tIHZhcmlhYmxlIGhhcyBhIHByb2JhYmlsaXR5IGRpc3RyaWJ1dGlvbiB0aGF0IGlzIGFwcHJveGltYXRlZCB3aXRoIHRoZSBub3JtYWwgZGlzdHJpYnV0aW9uLCB0aGVuIGFsbCB3ZSBuZWVkIHRvIGRlc2NyaWJlIHRoZSBwcm9iYWJpbGl0eSBkaXN0cmlidXRpb24gYXJlIHRoZSBhdmVyYWdlIGFuZCBzdGFuZGFyZCBkZXZpYXRpb24sIHJlZmVycmVkIHRvIGFzIHRoZSBleHBlY3RlZCB2YWx1ZSBhbmQgc3RhbmRhcmQgZXJyb3IuCgpXZSBwcmV2aW91c2x5IHJhbiB0aGlzIE1vbnRlIENhcmxvIHNpbXVsYXRpb246CgpgYGB7cn0KbiA8LSAxMDAwCkIgPC0gMTAwMDAKcm91bGV0dGVfd2lubmluZ3MgPC0gZnVuY3Rpb24obil7CiAgWCA8LSBzYW1wbGUoYygtMSwxKSwgbiwgcmVwbGFjZT1UUlVFLCBwcm9iPWMoOS8xOSwgMTAvMTkpKQogIHN1bShYKQp9ClMgPC0gcmVwbGljYXRlKEIsIHJvdWxldHRlX3dpbm5pbmdzKG4pKQpgYGAKCmBgYHtyfQpTICU+JSBkYXRhX2ZyYW1lKCkgJT4lIGdncGxvdChhZXMoUykpICsgZ2VvbV9oaXN0b2dyYW0oKQpgYGAKClRoZSBDZW50cmFsIExpbWl0IFRoZW9yZW0gKENMVCkgdGVsbHMgdXMgdGhhdCB0aGUgc3VtICRTJCBpcyBhcHByb3hpbWF0ZWQgYnkgYSBub3JtYWwgZGlzdHJpYnV0aW9uLiBVc2luZyB0aGUgZm9ybXVsYXMgYWJvdmUsIHdlIGtub3cgdGhhdCB0aGUgZXhwZWN0ZWQgdmFsdWUgYW5kIHN0YW5kYXJkIGVycm9yIGFyZToKCmBgYHtyfQpuICogKDIwLTE4KS8zOApgYGAKCmBgYHtyfQpzcXJ0KG4pICogMiAqIHNxcnQoOTApIC8gMTkKYGBgCgpUaGUgdGhlb3JldGljYWwgdmFsdWVzIGFib3ZlIG1hdGNoIHRob3NlIG9idGFpbmVkIHdpdGggdGhlIE1vbnRlIENhcmxvIHNpbXVsYXRpb246CgpgYGB7cn0KbWVhbihTKQpgYGAKCmBgYHtyfQpzZChTKQpgYGAKClVzaW5nIHRoZSBDTFQsIHdlIGNhbiBza2lwIHRoZSBNb250ZSBDYXJsbyBzaW11bGF0aW9uIGFuZCBpbnN0ZWFkIGNvbXB1dGUgdGhlIHByb2JhYmlsaXR5IG9mIHRoZSBjYXNpbm8gbG9zaW5nIG1vbmV5IHVzaW5nIHRoaXMgYXBwcm94aW1hdGlvbjoKCmBgYHtyfQptdSA8LSBuICogKDIwLTE4KS8zOApzZSA8LSBzcXJ0KG4pICogMiAqIHNxcnQoOTApLzE5CnBub3JtKDAsIG11LCBzZSkKYGBgCgp3aGljaCBpcyBhbHNvIGluIHZlcnkgZ29vZCBhZ3JlZW1lbnQgd2l0aCBvdXIgTW9udGUgQ2FybG8gcmVzdWx0OgoKYGBge3J9Cm1lYW4oUzwwKQpgYGAKCiMjIDE0LjcuMSBIb3cgbGFyZ2UgaXMgbGFyZ2UgaW4gdGhlIENlbnRyYWwgTGltaXQgVGhlb3JlbT8gCgo+ICJuPj0zMCIKClRoZSBDTFQgd29ya3Mgd2hlbiB0aGUgbnVtYmVyIG9mIGRyYXdzIGlzIGxhcmdlLiBCdXQgbGFyZ2UgaXMgYSByZWxhdGl2ZSB0ZXJtLiBJbiBtYW55IGNpcmN1bXN0YW5jZXMgYXMgZmV3IGFzICoqMzAgZHJhd3MqKiBpcyBlbm91Z2ggdG8gbWFrZSB0aGUgQ0xUIHVzZWZ1bC4gSW4gc29tZSBzcGVjaWZpYyBpbnN0YW5jZXMsIGFzIGZldyBhcyAxMCBpcyBlbm91Z2guIEhvd2V2ZXIsIHRoZXNlIHNob3VsZCBub3QgYmUgY29uc2lkZXJlZCBnZW5lcmFsIHJ1bGVzLiBOb3RlLCBmb3IgZXhhbXBsZSwgdGhhdCB3aGVuIHRoZSBwcm9iYWJpbGl0eSBvZiBzdWNjZXNzIGlzIHZlcnkgc21hbGwsIHdlIG5lZWQgbXVjaCBsYXJnZXIgc2FtcGxlIHNpemVzLgoKQnkgd2F5IG9mIGlsbHVzdHJhdGlvbiwgbGV04oCZcyBjb25zaWRlciB0aGUgbG90dGVyeS4gSW4gdGhlIGxvdHRlcnksIHRoZSBjaGFuY2VzIG9mIHdpbm5pbmcgYXJlIGxlc3MgdGhhbiAxIGluIGEgbWlsbGlvbi4gVGhvdXNhbmRzIG9mIHBlb3BsZSBwbGF5IHNvIHRoZSBudW1iZXIgb2YgZHJhd3MgaXMgdmVyeSBsYXJnZS4gWWV0IHRoZSBudW1iZXIgb2Ygd2lubmVycywgdGhlIHN1bSBvZiB0aGUgZHJhd3MsIHJhbmdlIGJldHdlZW4gMCBhbmQgNC4gVGhpcyBzdW0gaXMgY2VydGFpbmx5IG5vdCB3ZWxsIGFwcHJveGltYXRlZCBieSBhIG5vcm1hbCBkaXN0cmlidXRpb24sIHNvIHRoZSBDTFQgZG9lcyBub3QgYXBwbHksIGV2ZW4gd2l0aCB0aGUgdmVyeSBsYXJnZSBzYW1wbGUgc2l6ZS4gVGhpcyBpcyBnZW5lcmFsbHkgdHJ1ZSB3aGVuIHRoZSBwcm9iYWJpbGl0eSBvZiBhIHN1Y2Nlc3MgaXMgdmVyeSBsb3cuIEluIHRoZXNlIGNhc2VzLCB0aGUgUG9pc3NvbiBkaXN0cmlidXRpb24gaXMgbW9yZSBhcHByb3ByaWF0ZS4KCllvdSBjYW4gZXhhbWluZSB0aGUgcHJvcGVydGllcyBvZiB0aGUgUG9pc3NvbiBkaXN0cmlidXRpb24gdXNpbmcgZHBvaXMgYW5kIHBwb2lzLiBZb3UgY2FuIGdlbmVyYXRlIHJhbmRvbSB2YXJpYWJsZXMgZm9sbG93aW5nIHRoaXMgZGlzdHJpYnV0aW9uIHdpdGggcnBvaXMuIEhvd2V2ZXIsIHdlIGRvIG5vdCBjb3ZlciB0aGUgdGhlb3J5IGhlcmUuIFlvdSBjYW4gbGVhcm4gYWJvdXQgdGhlIFBvaXNzb24gZGlzdHJpYnV0aW9uIGluIGFueSBwcm9iYWJpbGl0eSB0ZXh0Ym9vayBhbmQgZXZlbiBXaWtpcGVkaWEuIAoKKioqCgojICoqMTQuOC4gU3RhdGlzdGljYWwgcHJvcGVydGllcyBvZiBhdmVyYWdlcyoqCgpUaGVyZSBhcmUgc2V2ZXJhbCB1c2VmdWwgbWF0aGVtYXRpY2FsIHJlc3VsdHMgdGhhdCB3ZSB1c2VkIGFib3ZlIGFuZCBvZnRlbiBlbXBsb3kgd2hlbiB3b3JraW5nIHdpdGggZGF0YS4gV2UgbGlzdCB0aGVtIGJlbG93LgoKMS4gVGhlIGV4cGVjdGVkIHZhbHVlIG9mIHRoZSBzdW0gb2YgcmFuZG9tIHZhcmlhYmxlcyBpcyB0aGUgc3VtIG9mIGVhY2ggcmFuZG9tIHZhcmlhYmxl4oCZcyBleHBlY3RlZCB2YWx1ZS4gV2UgY2FuIHdyaXRlIGl0IGxpa2UgdGhpczoKCiQkCkVbWF8xK1hfMisuLi4rWF9uXSA9IEVbWF8xXStFW1hfMl0rLi4uK0VbWF9uXQokJAoKSWYgdGhlICRYJCBhcmUgaW5kZXBlbmRlbnQgZHJhd3MgZnJvbSB0aGUgdXJuLCB0aGVuIHRoZXkgYWxsIGhhdmUgdGhlIHNhbWUgZXhwZWN0ZWQgdmFsdWUuIExldOKAmXMgY2FsbCBpdCAgCiTOvCQgYW5kIHRodXM6CgokJApFW1hfMStYXzIrLi4uK1hfbl0gPSBuXG11CiQkCgp3aGljaCBpcyBhbm90aGVyIHdheSBvZiB3cml0aW5nIHRoZSByZXN1bHQgd2Ugc2hvdyBhYm92ZSBmb3IgdGhlIHN1bSBvZiBkcmF3cy4KCgoyLiBUaGUgZXhwZWN0ZWQgdmFsdWUgb2YgYSBub24tcmFuZG9tIGNvbnN0YW50IHRpbWVzIGEgcmFuZG9tIHZhcmlhYmxlIGlzIHRoZSBub24tcmFuZG9tIGNvbnN0YW50IHRpbWVzIHRoZSBleHBlY3RlZCB2YWx1ZSBvZiBhIHJhbmRvbSB2YXJpYWJsZS4gVGhpcyBpcyBlYXNpZXIgdG8gZXhwbGFpbiB3aXRoIHN5bWJvbHM6CgokJApFW2FYXT1hIFx0aW1lcyBFW1hdCiQkCgpUbyBzZWUgd2h5IHRoaXMgaXMgaW50dWl0aXZlLCBjb25zaWRlciBjaGFuZ2Ugb2YgdW5pdHMuIElmIHdlIGNoYW5nZSB0aGUgdW5pdHMgb2YgYSByYW5kb20gdmFyaWFibGUsIHNheSBmcm9tIGRvbGxhcnMgdG8gY2VudHMsIHRoZSBleHBlY3RhdGlvbiBzaG91bGQgY2hhbmdlIGluIHRoZSBzYW1lIHdheS4gQSBjb25zZXF1ZW5jZSBvZiB0aGUgYWJvdmUgdHdvIGZhY3RzIGlzIHRoYXQgdGhlIGV4cGVjdGVkIHZhbHVlIG9mIHRoZSBhdmVyYWdlIG9mIGluZGVwZW5kZW50IGRyYXdzIGZyb20gdGhlIHNhbWUgdXJuIGlzIHRoZSBleHBlY3RlZCB2YWx1ZSBvZiB0aGUgdXJuLCBjYWxsIGl0ICTOvCQgYWdhaW46CgokJApFWyhYXzErWF8yKy4uLitYX24pL25dPUVbWF8xK1hfMisuLi4rWF9uXS9uID0gblxtdT1cbXUKJCQKCjMuIFRoZSBzcXVhcmUgb2YgdGhlIHN0YW5kYXJkIGVycm9yIG9mIHRoZSBzdW0gb2YgKippbmRlcGVuZGVudCoqIHJhbmRvbSB2YXJpYWJsZXMgaXMgdGhlIHN1bSBvZiB0aGUgc3F1YXJlIG9mIHRoZSBzdGFuZGFyZCBlcnJvciBvZiBlYWNoIHJhbmRvbSB2YXJpYWJsZS4gVGhpcyBvbmUgaXMgZWFzaWVyIHRvIHVuZGVyc3RhbmQgaW4gbWF0aCBmb3JtOgoKJCQKU0VbWF8xK1hfMisuLi4rWF9uXSA9IFxzcXJ0e1NFW1hfMV1eMitTRVtYXzJdXjIrLi4uK1NFW1hfbl1eMn0KJCQKClRoZSBzcXVhcmUgb2YgdGhlIHN0YW5kYXJkIGVycm9yIGlzIHJlZmVycmVkIHRvIGFzIHRoZSAqKnZhcmlhbmNlKiogaW4gc3RhdGlzdGljYWwgdGV4dGJvb2tzLiBOb3RlIHRoYXQgdGhpcyBwYXJ0aWN1bGFyIHByb3BlcnR5IGlzIG5vdCBhcyBpbnR1aXRpdmUgYXMgdGhlIHByZXZpb3VzIHRocmVlIGFuZCBtb3JlIGluIGRlcHRoIGV4cGxhbmF0aW9ucyBjYW4gYmUgZm91bmQgaW4gc3RhdGlzdGljcyB0ZXh0Ym9va3MuCgo0LiAgVGhlIHN0YW5kYXJkIGVycm9yIG9mIGEgbm9uLXJhbmRvbSBjb25zdGFudCB0aW1lcyBhIHJhbmRvbSB2YXJpYWJsZSBpcyB0aGUgbm9uLXJhbmRvbSBjb25zdGFudCB0aW1lcyB0aGUgcmFuZG9tIHZhcmlhYmxl4oCZcyBzdGFuZGFyZCBlcnJvci4gQXMgd2l0aCB0aGUgZXhwZWN0YXRpb246CgokJApTRVthWF09YVx0aW1lc1tYXQokJAoKVG8gc2VlIHdoeSB0aGlzIGlzIGludHVpdGl2ZSwgYWdhaW4gdGhpbmsgb2YgdW5pdHMuCgpBIGNvbnNlcXVlbmNlIG9mIDMgYW5kIDQgaXMgdGhhdCB0aGUgc3RhbmRhcmQgZXJyb3Igb2YgdGhlIGF2ZXJhZ2Ugb2YgaW5kZXBlbmRlbnQgZHJhd3MgZnJvbSB0aGUgc2FtZSB1cm4gaXMgdGhlIHN0YW5kYXJkIGRldmlhdGlvbiBvZiB0aGUgdXJuIGRpdmlkZWQgYnkgdGhlIHNxdWFyZSByb290IG9mICAKJG4kICh0aGUgbnVtYmVyIG9mIGRyYXdzKSwgY2FsbCBpdCTPgyQgOgoKJCQKU0VbKFhfMStYXzIrLi4uK1hfbikvbl09U0VbWF8xK1hfMisuLi4rWF9uXSBcXAo9XHNxcnR7U0VbWF8xXV4yK1NFW1hfMl1eMisuLi4rU0VbWF9uXV4yfS9uIFxcCj1cc3FydHtcc2lnbWFeMitcc2lnbWFeMisuLi5cc2lnbWFeMn0vbiBcXAo9XHNxcnR7blxzaWdtYV4yfS9uIFxcCj1cc2lnbWEvXHNxcnR7bn0KJCQKCjUuIElmICRYJCAgaXMgYSBub3JtYWxseSBkaXN0cmlidXRlZCByYW5kb20gdmFyaWFibGUsIHRoZW4gaWYgICRhJCAgYW5kICRiJCAgYXJlIG5vbi1yYW5kb20gY29uc3RhbnRzLCAkYVgrYiQgIGlzIGFsc28gYSBub3JtYWxseSBkaXN0cmlidXRlZCByYW5kb20gdmFyaWFibGUuIEFsbCB3ZSBhcmUgZG9pbmcgaXMgY2hhbmdpbmcgdGhlIHVuaXRzIG9mIHRoZSByYW5kb20gdmFyaWFibGUgYnkgbXVsdGlwbHlpbmcgYnkgICRhJCAsIHRoZW4gc2hpZnRpbmcgdGhlIGNlbnRlciBieSAgJGIkLgoKJCQKYSBcc2ltIE5cXApiIFxzaW0gTlxcCj0+IChhWCtiKSBcc2ltIE4KJCQKTm90ZSB0aGF0IHN0YXRpc3RpY2FsIHRleHRib29rcyB1c2UgdGhlIEdyZWVrIGxldHRlcnMgJM68JCAgYW5kICAkz4MkICB0byBkZW5vdGUgdGhlIGV4cGVjdGVkIHZhbHVlIGFuZCBzdGFuZGFyZCBlcnJvciwgcmVzcGVjdGl2ZWx5LiBUaGlzIGlzIGJlY2F1c2UgICTOvCQgIGlzIHRoZSBHcmVlayBsZXR0ZXIgZm9yICRtJCAsIHRoZSBmaXJzdCBsZXR0ZXIgb2YgbWVhbiwgd2hpY2ggaXMgYW5vdGhlciB0ZXJtIHVzZWQgZm9yIGV4cGVjdGVkIHZhbHVlLiBTaW1pbGFybHksICAkz4MkICBpcyB0aGUgR3JlZWsgbGV0dGVyIGZvciAkcyQgLCB0aGUgZmlyc3QgbGV0dGVyIG9mIHN0YW5kYXJkIGVycm9yLgoKIyAqKjE0LjkgTGF3IG9mIGxhcmdlIG51bWJlcnMqKgoKKiDtkZzrs7jsnZgg7YGs6riw6rCAIOy7pOyngOunjCBTRU3snbQg7KCB7Ja07KeE64ukLiAgCgpBbiBpbXBvcnRhbnQgaW1wbGljYXRpb24gb2YgdGhlIGZpbmFsIHJlc3VsdCBpcyB0aGF0IHRoZSBzdGFuZGFyZCBlcnJvciBvZiB0aGUgYXZlcmFnZSBiZWNvbWVzIHNtYWxsZXIgYW5kIHNtYWxsZXIgYXMgICRuJCAgZ3Jvd3MgbGFyZ2VyLiBXaGVuICAkbiQgIGlzIHZlcnkgbGFyZ2UsIHRoZW4gdGhlIHN0YW5kYXJkIGVycm9yIGlzIHByYWN0aWNhbGx5IDAgYW5kIHRoZSBhdmVyYWdlIG9mIHRoZSBkcmF3cyBjb252ZXJnZXMgdG8gdGhlIGF2ZXJhZ2Ugb2YgdGhlIHVybi4gVGhpcyBpcyBrbm93biBpbiBzdGF0aXN0aWNhbCB0ZXh0Ym9va3MgYXMgdGhlIGxhdyBvZiBsYXJnZSBudW1iZXJzIG9yIHRoZSBsYXcgb2YgYXZlcmFnZXMuCgojIyAxNC45LjEgTWlzaW50ZXJwcmV0aW5nIGxhdyBvZiBhdmVyYWdlcwoKKiDtgbAg7IiY7J2YIOuyley5meydhCDthrXtlZjsl6wg7ZiE7IOB7J2EIO2VtOyEne2VoCDrlYzsl5DripQg6rCBIOyLnO2WieydtCDrj4Xrpr3si5ztlonsnbTrnbzripQg7KCQ7J2EIOycoOydmO2VtOyVvCDtlZzri6QuIAoKVGhlIGxhdyBvZiBhdmVyYWdlcyBpcyBzb21ldGltZXMgbWlzaW50ZXJwcmV0ZWQuIEZvciBleGFtcGxlLCBpZiB5b3UgdG9zcyBhIGNvaW4gNSB0aW1lcyBhbmQgc2VlIGEgaGVhZCBlYWNoIHRpbWUsIHlvdSBtaWdodCBoZWFyIHNvbWVvbmUgYXJndWUgdGhhdCB0aGUgbmV4dCB0b3NzIGlzIHByb2JhYmx5IGEgdGFpbCBiZWNhdXNlIG9mIHRoZSBsYXcgb2YgYXZlcmFnZXM6IG9uIGF2ZXJhZ2Ugd2Ugc2hvdWxkIHNlZSA1MCUgaGVhZHMgYW5kIDUwJSB0YWlscy4gQSBzaW1pbGFyIGFyZ3VtZW50IHdvdWxkIGJlIHRvIHNheSB0aGF0IHJlZCDigJxpcyBkdWXigJ0gb24gdGhlIHJvdWxldHRlIHdoZWVsIGFmdGVyIHNlZWluZyBibGFjayBjb21lIHVwIGZpdmUgdGltZXMgaW4gYSByb3cuIFRoZXNlIGV2ZW50cyBhcmUgaW5kZXBlbmRlbnQgc28gdGhlIGNoYW5jZSBvZiBhIGNvaW4gbGFuZGluZyBoZWFkcyBpcyA1MCUgcmVnYXJkbGVzcyBvZiB0aGUgcHJldmlvdXMgNS4gVGhpcyBpcyBhbHNvIHRoZSBjYXNlIGZvciB0aGUgcm91bGV0dGUgb3V0Y29tZS4gVGhlIGxhdyBvZiBhdmVyYWdlcyBhcHBsaWVzIG9ubHkgd2hlbiB0aGUgbnVtYmVyIG9mIGRyYXdzIGlzIHZlcnkgbGFyZ2UgYW5kIG5vdCBpbiBzbWFsbCBzYW1wbGVzLiBBZnRlciBhIG1pbGxpb24gdG9zc2VzLCB5b3Ugd2lsbCBkZWZpbml0ZWx5IHNlZSBhYm91dCA1MCUgaGVhZHMgcmVnYXJkbGVzcyBvZiB0aGUgb3V0Y29tZSBvZiB0aGUgZmlyc3QgZml2ZSB0b3NzZXMuCgpBbm90aGVyIGZ1bm55IG1pc3VzZSBvZiB0aGUgbGF3IG9mIGF2ZXJhZ2VzIGlzIGluIHNwb3J0cyB3aGVuIFRWIHNwb3J0c2Nhc3RlcnMgcHJlZGljdCBhIHBsYXllciBpcyBhYm91dCB0byBzdWNjZWVkIGJlY2F1c2UgdGhleSBoYXZlIGZhaWxlZCBhIGZldyB0aW1lcyBpbiBhIHJvdy4KCiMgKioxNC4xMCBFeGVyY2lzZXMqKgoKMS4gSW4gQW1lcmljYW4gUm91bGV0dGUgeW91IGNhbiBhbHNvIGJldCBvbiBncmVlbi4gVGhlcmUgYXJlIDE4IHJlZHMsIDE4IGJsYWNrcyBhbmQgMiBncmVlbnMgKDAgYW5kIDAwKS4gV2hhdCBhcmUgdGhlIGNoYW5jZXMgdGhlIGdyZWVuIGNvbWVzIG91dD8KCj4gMS8yMAoKMi4gVGhlIHBheW91dCBmb3Igd2lubmluZyBvbiBncmVlbiBpcyBcJDE3IGRvbGxhcnMuIFRoaXMgbWVhbnMgdGhhdCBpZiB5b3UgYmV0IGEgZG9sbGFyIGFuZCBpdCBsYW5kcyBvbiBncmVlbiwgeW91IGdldCBcJDE3LiBDcmVhdGUgYSBzYW1wbGluZyBtb2RlbCB1c2luZyBzYW1wbGUgdG8gc2ltdWxhdGUgdGhlIHJhbmRvbSB2YXJpYWJsZSAgJFgkICBmb3IgeW91ciB3aW5uaW5ncy4gSGludDogc2VlIHRoZSBleGFtcGxlIGJlbG93IGZvciBob3cgaXQgc2hvdWxkIGxvb2sgbGlrZSB3aGVuIGJldHRpbmcgb24gcmVkLgoKYGBge3J9CnggPC0gc2FtcGxlKGMoMSwtMSksIDEsIHByb2IgPSBjKDkvMTksIDEwLzE5KSkKYGBgCgo+IAoKCjMuIENvbXB1dGUgdGhlIGV4cGVjdGVkIHZhbHVlIG9mICAkWCQuCgo0LiBDb21wdXRlIHRoZSBzdGFuZGFyZCBlcnJvciBvZiAgJFgkLgoKNS4gTm93IGNyZWF0ZSBhIHJhbmRvbSB2YXJpYWJsZSAgJFMkICB0aGF0IGlzIHRoZSBzdW0gb2YgeW91ciB3aW5uaW5ncyBhZnRlciBiZXR0aW5nIG9uIGdyZWVuIDEwMDAgdGltZXMuIEhpbnQ6IGNoYW5nZSB0aGUgYXJndW1lbnQgc2l6ZSBhbmQgcmVwbGFjZSBpbiB5b3VyIGFuc3dlciB0byBxdWVzdGlvbiAyLiBTdGFydCB5b3VyIGNvZGUgYnkgc2V0dGluZyB0aGUgc2VlZCB0byAxIHdpdGggc2V0LnNlZWQoMSkuCgo2LiBXaGF0IGlzIHRoZSBleHBlY3RlZCB2YWx1ZSBvZiAgJFMkID8KCjcuIFdoYXQgaXMgdGhlIHN0YW5kYXJkIGVycm9yIG9mICAkUyQgPwoKOC4gV2hhdCBpcyB0aGUgcHJvYmFiaWxpdHkgdGhhdCB5b3UgZW5kIHVwIHdpbm5pbmcgbW9uZXk/IEhpbnQ6IHVzZSB0aGUgQ0xULgoKOS4gQ3JlYXRlIGEgTW9udGUgQ2FybG8gc2ltdWxhdGlvbiB0aGF0IGdlbmVyYXRlcyAxLDAwMCBvdXRjb21lcyBvZiAgJFMkIC4gQ29tcHV0ZSB0aGUgYXZlcmFnZSBhbmQgc3RhbmRhcmQgZGV2aWF0aW9uIG9mIHRoZSByZXN1bHRpbmcgbGlzdCB0byBjb25maXJtIHRoZSByZXN1bHRzIG9mIDYgYW5kIDcuIFN0YXJ0IHlvdXIgY29kZSBieSBzZXR0aW5nIHRoZSBzZWVkIHRvIDEgd2l0aCBzZXQuc2VlZCgxKS4KCjEwLiBOb3cgY2hlY2sgeW91ciBhbnN3ZXIgdG8gOCB1c2luZyB0aGUgTW9udGUgQ2FybG8gcmVzdWx0LgoKMTEuIFRoZSBNb250ZSBDYXJsbyByZXN1bHQgYW5kIHRoZSBDTFQgYXBwcm94aW1hdGlvbiBhcmUgY2xvc2UsIGJ1dCBub3QgdGhhdCBjbG9zZS4gV2hhdCBjb3VsZCBhY2NvdW50IGZvciB0aGlzPwoKYS4gMSwwMDAgc2ltdWxhdGlvbnMgaXMgbm90IGVub3VnaC4gSWYgd2UgZG8gbW9yZSwgdGhleSBtYXRjaC4KYi4gVGhlIENMVCBkb2VzIG5vdCB3b3JrIGFzIHdlbGwgd2hlbiB0aGUgcHJvYmFiaWxpdHkgb2Ygc3VjY2VzcyBpcyBzbWFsbC4gSW4gdGhpcyBjYXNlLCBpdCB3YXMgMS8xOS4gSWYgd2UgbWFrZSB0aGUgbnVtYmVyIG9mIHJvdWxldHRlIHBsYXlzIGJpZ2dlciwgdGhleSB3aWxsIG1hdGNoIGJldHRlci4KYy4gVGhlIGRpZmZlcmVuY2UgaXMgd2l0aGluIHJvdW5kaW5nIGVycm9yLgpkLiBUaGUgQ0xUIG9ubHkgd29ya3MgZm9yIGF2ZXJhZ2VzLgoKMTIuIE5vdyBjcmVhdGUgYSByYW5kb20gdmFyaWFibGUgICRZJCAgdGhhdCBpcyB5b3VyIGF2ZXJhZ2Ugd2lubmluZ3MgcGVyIGJldCBhZnRlciBwbGF5aW5nIG9mZiB5b3VyIHdpbm5pbmdzIGFmdGVyIGJldHRpbmcgb24gZ3JlZW4gMSwwMDAgdGltZXMuCgoxMy4gV2hhdCBpcyB0aGUgZXhwZWN0ZWQgdmFsdWUgb2YgICRZJCA/CgoxNC4gV2hhdCBpcyB0aGUgc3RhbmRhcmQgZXJyb3Igb2YgICRZJCA/CgoxNS4gV2hhdCBpcyB0aGUgcHJvYmFiaWxpdHkgdGhhdCB5b3UgZW5kIHVwIHdpdGggd2lubmluZ3MgcGVyIGdhbWUgdGhhdCBhcmUgcG9zaXRpdmU/IEhpbnQ6IHVzZSB0aGUgQ0xULgoKMTYuIENyZWF0ZSBhIE1vbnRlIENhcmxvIHNpbXVsYXRpb24gdGhhdCBnZW5lcmF0ZXMgMiw1MDAgb3V0Y29tZXMgb2YgICRZJCAuIENvbXB1dGUgdGhlIGF2ZXJhZ2UgYW5kIHN0YW5kYXJkIGRldmlhdGlvbiBvZiB0aGUgcmVzdWx0aW5nIGxpc3QgdG8gY29uZmlybSB0aGUgcmVzdWx0cyBvZiA2IGFuZCA3LiBTdGFydCB5b3VyIGNvZGUgYnkgc2V0dGluZyB0aGUgc2VlZCB0byAxIHdpdGggc2V0LnNlZWQoMSkuCgoxNy4gTm93IGNoZWNrIHlvdXIgYW5zd2VyIHRvIDggdXNpbmcgdGhlIE1vbnRlIENhcmxvIHJlc3VsdC4KCjE4LiBUaGUgTW9udGUgQ2FybG8gcmVzdWx0IGFuZCB0aGUgQ0xUIGFwcHJveGltYXRpb24gYXJlIG5vdyBtdWNoIGNsb3Nlci4gV2hhdCBjb3VsZCBhY2NvdW50IGZvciB0aGlzPwoKQS4gV2UgYXJlIG5vdyBjb21wdXRpbmcgYXZlcmFnZXMgaW5zdGVhZCBvZiBzdW1zLgpCLiAyLDUwMCBNb250ZSBDYXJsbyBzaW11bGF0aW9ucyBpcyBub3QgYmV0dGVyIHRoYW4gMSwwMDAuCkMuIFRoZSBDTFQgd29ya3MgYmV0dGVyIHdoZW4gdGhlIHNhbXBsZSBzaXplIGlzIGxhcmdlci4gV2UgaW5jcmVhc2VkIGZyb20gMSwwMDAgdG8gMiw1MDAuCkQuIEl0IGlzIG5vdCBjbG9zZXIuIFRoZSBkaWZmZXJlbmNlIGlzIHdpdGhpbiByb3VuZGluZyBlcnJvci4KCiMgKioxNC4xMSBDYXNlIHN0dWR5OlRoZSBCaWcgU2hvcnQqKgoKIyMgMTQuMTEuMSBJbnRlcmVzdCByYXRlcyBleHBsYWluZWQgd2l0aCBjaGFuY2UgbW9kZWwKCk1vcmUgY29tcGxleCB2ZXJzaW9ucyBvZiB0aGUgc2FtcGxpbmcgbW9kZWxzIHdlIGhhdmUgZGlzY3Vzc2VkIGFyZSBhbHNvIHVzZWQgYnkgYmFua3MgdG8gZGVjaWRlIGludGVyZXN0IHJhdGVzLiBTdXBwb3NlIHlvdSBydW4gYSBzbWFsbCBiYW5rIHRoYXQgaGFzIGEgaGlzdG9yeSBvZiBpZGVudGlmeWluZyBwb3RlbnRpYWwgaG9tZW93bmVycyB0aGF0IGNhbiBiZSB0cnVzdGVkIHRvIG1ha2UgcGF5bWVudHMuIEluIGZhY3QsIGhpc3RvcmljYWxseSwgaW4gYSBnaXZlbiB5ZWFyLCBvbmx5IDIlIG9mIHlvdXIgY3VzdG9tZXJzIGRlZmF1bHQsIG1lYW5pbmcgdGhhdCB0aGV5IGRvbuKAmXQgcGF5IGJhY2sgdGhlIG1vbmV5IHRoYXQgeW91IGxlbnQgdGhlbS4gSG93ZXZlciwgeW91IGFyZSBhd2FyZSB0aGF0IGlmIHlvdSBzaW1wbHkgbG9hbiBtb25leSB0byBldmVyeWJvZHkgd2l0aG91dCBpbnRlcmVzdCwgeW91IHdpbGwgZW5kIHVwIGxvc2luZyBtb25leSBkdWUgdG8gdGhpcyAyJS4gQWx0aG91Z2ggeW91IGtub3cgMiUgb2YgeW91ciBjbGllbnRzIHdpbGwgcHJvYmFibHkgZGVmYXVsdCwgeW91IGRvbuKAmXQga25vdyB3aGljaCBvbmVzLiBZZXQgYnkgY2hhcmdpbmcgZXZlcnlib2R5IGp1c3QgYSBiaXQgZXh0cmEgaW4gaW50ZXJlc3QsIHlvdSBjYW4gbWFrZSB1cCB0aGUgbG9zc2VzIGluY3VycmVkIGR1ZSB0byB0aGF0IDIlIGFuZCBhbHNvIGNvdmVyIHlvdXIgb3BlcmF0aW5nIGNvc3RzLiBZb3UgY2FuIGFsc28gbWFrZSBhIHByb2ZpdCwgYnV0IGlmIHlvdSBzZXQgdGhlIGludGVyZXN0IHJhdGVzIHRvbyBoaWdoLCB5b3VyIGNsaWVudHMgd2lsbCBnbyB0byBhbm90aGVyIGJhbmsuIFdlIHVzZSBhbGwgdGhlc2UgZmFjdHMgYW5kIHNvbWUgcHJvYmFiaWxpdHkgdGhlb3J5IHRvIGRlY2lkZSB3aGF0IGludGVyZXN0IHJhdGUgeW91IHNob3VsZCBjaGFyZ2UuCgpTdXBwb3NlIHlvdXIgYmFuayB3aWxsIGdpdmUgb3V0IDEsMDAwIGxvYW5zIGZvciAkMTgwLDAwMCB0aGlzIHllYXIuIEFsc28sIGFmdGVyIGFkZGluZyB1cCBhbGwgY29zdHMsIHN1cHBvc2UgeW91ciBiYW5rIGxvc2VzIFwkMjAwLDAwMCBwZXIgZm9yZWNsb3N1cmUuIEZvciBzaW1wbGljaXR5LCB3ZSBhc3N1bWUgdGhpcyBpbmNsdWRlcyBhbGwgb3BlcmF0aW9uYWwgY29zdHMuIEEgc2FtcGxpbmcgbW9kZWwgZm9yIHRoaXMgc2NlbmFyaW8gY2FuIGJlIGNvZGVkIGxpa2UgdGhpczoKCmBgYHtyfQpuIDwtIDEwMDAKbG9zc19wZXJfZm9yZWNsb3N1cmUgPC0gLTIwMDAwMApwIDwtIDAuMDIgI2xvc3NlcyBpbmN1cnJlZCBkdWUgdG8gdGhhdCAyJQpkZWZhdWx0cyA8LSBzYW1wbGUoYygwLDEpLCBuLCBwcm9iPWMoMS1wLHApLCByZXBsYWNlPVRSVUUpCnN1bShkZWZhdWx0cyAqIGxvc3NfcGVyX2ZvcmVjbG9zdXJlKQpgYGAKCk5vdGUgdGhhdCB0aGUgdG90YWwgbG9zcyBkZWZpbmVkIGJ5IHRoZSBmaW5hbCBzdW0gaXMgYSByYW5kb20gdmFyaWFibGUuIEV2ZXJ5IHRpbWUgeW91IHJ1biB0aGUgYWJvdmUgY29kZSwgeW91IGdldCBhIGRpZmZlcmVudCBhbnN3ZXIuIFdlIGNhbiBlYXNpbHkgY29uc3RydWN0IGEgTW9udGUgQ2FybG8gc2ltdWxhdGlvbiB0byBnZXQgYW4gaWRlYSBvZiB0aGUgZGlzdHJpYnV0aW9uIG9mIHRoaXMgcmFuZG9tIHZhcmlhYmxlLgoKYGBge3J9CkIgPC0gMTAwMDAKbG9zc2VzIDwtIHJlcGxpY2F0ZShCLCB7CiAgICBkZWZhdWx0cyA8LSBzYW1wbGUoIGMoMCwxKSwgbiwgcHJvYj1jKDEtcCwgcCksIHJlcGxhY2UgPSBUUlVFKSAKICBzdW0oZGVmYXVsdHMgKiBsb3NzX3Blcl9mb3JlY2xvc3VyZSkKfSkKYGBgCgpXZSBkb27igJl0IHJlYWxseSBuZWVkIGEgTW9udGUgQ2FybG8gc2ltdWxhdGlvbiB0aG91Z2guIFVzaW5nIHdoYXQgd2UgaGF2ZSBsZWFybmVkLCB0aGUgQ0xUIHRlbGxzIHVzIHRoYXQgYmVjYXVzZSBvdXIgbG9zc2VzIGFyZSBhIHN1bSBvZiBpbmRlcGVuZGVudCBkcmF3cywgaXRzIGRpc3RyaWJ1dGlvbiBpcyBhcHByb3hpbWF0ZWx5IG5vcm1hbCB3aXRoIGV4cGVjdGVkIHZhbHVlIGFuZCBzdGFuZGFyZCBlcnJvcnMgZ2l2ZW4gYnk6CgpgYGB7cn0KbioocCpsb3NzX3Blcl9mb3JlY2xvc3VyZSArICgxLXApKjApCmBgYAoKYGBge3J9CnNxcnQobikqYWJzKGxvc3NfcGVyX2ZvcmVjbG9zdXJlKSpzcXJ0KHAqKDEtcCkpCmBgYAoKV2UgY2FuIG5vdyBzZXQgYW4gaW50ZXJlc3QgcmF0ZSB0byBndWFyYW50ZWUgdGhhdCwgb24gYXZlcmFnZSwgd2UgYnJlYWsgZXZlbi4gQmFzaWNhbGx5LCB3ZSBuZWVkIHRvIGFkZCBhIHF1YW50aXR5ICR4JCAgdG8gZWFjaCBsb2FuLCB3aGljaCBpbiB0aGlzIGNhc2UgYXJlIHJlcHJlc2VudGVkIGJ5IGRyYXdzLCBzbyB0aGF0IHRoZSBleHBlY3RlZCB2YWx1ZSBpcyAwLiBJZiB3ZSBkZWZpbmUgJGwkICB0byBiZSB0aGUgbG9zcyBwZXIgZm9yZWNsb3N1cmUsIHdlIG5lZWQ6CgokJApscCArIHgoMS1wKT0wCiQkCgp3aGljaCBpbXBsaWVzICR4JCAgaXMKCmBgYHtyfQotIGxvc3NfcGVyX2ZvcmVjbG9zdXJlKnAvKDEtcCkKYGBgCgpvciBhbiBpbnRlcmVzdCByYXRlIG9mIDAuMDIzLgoKSG93ZXZlciwgd2Ugc3RpbGwgaGF2ZSBhIHByb2JsZW0uIEFsdGhvdWdoIHRoaXMgaW50ZXJlc3QgcmF0ZSBndWFyYW50ZWVzIHRoYXQgb24gYXZlcmFnZSB3ZSBicmVhayBldmVuLCB0aGVyZSBpcyBhIDUwJSBjaGFuY2UgdGhhdCB3ZSBsb3NlIG1vbmV5LiBJZiBvdXIgYmFuayBsb3NlcyBtb25leSwgd2UgaGF2ZSB0byBjbG9zZSBpdCBkb3duLiBXZSB0aGVyZWZvcmUgbmVlZCB0byBwaWNrIGFuIGludGVyZXN0IHJhdGUgdGhhdCBtYWtlcyBpdCB1bmxpa2VseSBmb3IgdGhpcyB0byBoYXBwZW4uIEF0IHRoZSBzYW1lIHRpbWUsIGlmIHRoZSBpbnRlcmVzdCByYXRlIGlzIHRvbyBoaWdoLCBvdXIgY2xpZW50cyB3aWxsIGdvIHRvIGFub3RoZXIgYmFuayBzbyB3ZSBtdXN0IGJlIHdpbGxpbmcgdG8gdGFrZSBzb21lIHJpc2tzLiBTbyBsZXTigJlzIHNheSB0aGF0IHdlIHdhbnQgb3VyIGNoYW5jZXMgb2YgbG9zaW5nIG1vbmV5IHRvIGJlIDEgaW4gMTAwLCB3aGF0IGRvZXMgdGhlICR4JCBxdWFudGl0eSBuZWVkIHRvIGJlIG5vdz8gVGhpcyBvbmUgaXMgYSBiaXQgaGFyZGVyLiBXZSB3YW50IHRoZSBzdW0gICRTJCAgdG8gaGF2ZToKCiQkClByKFM8MCk9MC4wMQokJAoKV2Uga25vdyB0aGF0ICRTJCBpcyBhcHByZW94aW1hdGVseSBub3JtYWwuIFRoZSBleHBlY3RlZCB2YWx1ZSBvZiAkUyQgaXMgCgokJApFW1NdPXtscF94KDEtcCl9bgokJAoKd2l0aCAkbiQgdGhlIG51bWJlciBvZiBkcmF3cywgd2hpY2ggaW4gdGhpcyBjYXNlIHJlcHJlc2VudHMgbG9hbnMuIFRoZSBzdGFuZGFyZCBlcnJvciBpcyAKCiQkClNEW1NdPXx4LWx8XHNxcnR7bnAoMS1wKX0KJCQKCkJlY2F1c2UgJHgkIGlzIHBvc2l0aXZlIGFuZCAkbCQgbmVnYXRpdmUgJHx4LWx8PXgtbCQuIE5vdGUgdGhhdCB0aGVzZSBhcmUganVzdCBhbiBhcHBpY2F0aW9uIG9mIHRoZSBmb3JtdWxhcyBzaG93biBlYXJsaWVyLCBidXQgdXNpbmcgbW9yZSBjb21wYWN0IHN5bWJvbHMuCgpOb3cgd2UgYXJlIGdvaW5nIHRvIHVzZSBhIG1hdGhlbWF0aWNhbCAidHJpY2siIHRoYXQgaXMgdmVyeSBjb21tb24gaW4gc3RhdGlzdGljcy4gV2UgYWRkIGFuZCBzdWJzdHJhY3QgdGhlIHNhbWUgcXVhbnRpdGllcyB0byBib3RoIHNpZGVzIG9mIHRoZSBldmVudCAkUzwwJCBzbyB0aGF0IHRoZSBwcm9iYWJpbGl0eSBkb2VzIG5vdCBjaGFuZ2UgYW5kIHdlIGVuZCB1cCB3aXRoIGEgc3RhbmRhcmQgbm9ybWFsIHJhbmRvbSB2YXJpYWJsZSBvbiB0aGUgbGVmdCwgd2hpY2ggd2lsbCB0aGVuIHBlcm1pdCB1cyB0byB3cml0ZSBkb3duIGFuIGVxdWF0aW9uIHdpdGggb25seSAkeCQgYXMgYW4gdW5rbm93bi4gIFRoZSAidHJpY2siIGlzIGFzIGZvbGxvdzoKCklmICRQcihTPDApPTAuMDEkIHRoZW4gCgokJApQcihcZnJhY3tTLUVbU119e1NFW1NdfSA8IFxmcmFjey1FW1NdfXtTRVtTXX0pCiQkCgpBbmQgcmVtZW1iZXIgJEVbU10kIGFuZCAkU0VbU10kIGFyZSB0aGUgZXhwZWN0ZWQgdmFsdWUgYW5kIHN0YW5kYXJkIGVycm9yIG9mICRTJCwgcmVwZWN0aXZlbHkuIEFsbCB3ZSBkaWQgYWJvdmUgd2FzIGFkZCBhbmQgZGl2aWRlIGJ5IHRoZSBzYW1lIHF1YW50aXR5IG9uIGJvdGggc2lkZXMuIFdlIGRpZCB0aGlzIGJlY2F1c2Ugbm93IHRoZSB0ZXJtIG9uIHRoZSBsZWZ0IGlzIGEgc3RhbmRhcmQgbm9ybWFsIHJhbmRvbSB2YXJpYWJsZSwgd2hpY2ggd2Ugd2lsbCByZW5hbWUgICRaJCAuIE5vdyB3ZSBmaWxsIGluIHRoZSBibGFua3Mgd2l0aCB0aGUgYWN0dWFsIGZvcm11bGEgZm9yIGV4cGVjdGVkIHZhbHVlIGFuZCBzdGFuZGFyZCBlcnJvcjogCgokJApQcihaPFxmcmFjey1ce2xwK3goMS1wKVx9fXsoeC1sKVxzcXJ0eyhucCgxLXApKX19KT0wLjAxCiQkCgpJdCBtYXkgbG9vayBjb21wbGljYXRlZCwgYnV0IHJlbWVtYmVyIHRoYXQgJGwkLCAkcCQgIGFuZCAkbiQgYXJlIGFsbCBrbm93biBhbW91bnRzLCBzbyBldmVudHVhbGx5IHdlIHdpbGwgcmVwbGFjZSB0aGVtIHdpdGggbnVtYmVycy4KCk5vdyBiZWNhdXNlIHRoZSBaIGlzIGEgbm9ybWFsIHJhbmRvbSB3aXRoIGV4cGVjdGVkIHZhbHVlIDAgYW5kIHN0YW5kYXJkIGVycm9yIDEsIGl0IG1lYW5zIHRoYXQgdGhlIHF1YW50aXR5IG9uIHRoZSByaWdodCBzaWRlIG9mIHRoZSA8IHNpZ24gbXVzdCBiZSBlcXVhbCB0bzoKCmBgYHtyfQpxbm9ybSgwLjAxKQpgYGAKCgpmb3IgdGhlIGVxdWF0aW9uIHRvIGhvbGQgdHJ1ZS4gUmVtZW1iZXIgdGhhdCAgJHo9JCBgcW5vcm0oMC4wMSlgIGdpdmVzIHVzIHRoZSB2YWx1ZSBvZiAkeiQgZm9yIHdoaWNoOgoKJCQKUHIoWDw9Wik9MC4wMQokJAoKU28gdGhpcyBtZWFucyB0aGF0IHRoZSByaWdodCBzaWRlIG9mIHRoZSBjb21wbGljYXRlZCBlcXVhdGlvbiBtdXN0IGJlICAkej0kIGBxbm9ybSgwLjAxKWAuCgokJApcZnJhY3stXHtscCt4KGwtcClcfW59eyh4LWwpXHNxcnR7bnAoMS1wKX19PXoKJCQKClRoZSB0cmljayB3b3JrcyBiZWNhdXNlIHdlIGVuZCB1cCB3aXRoIGFuIGV4cHJlc3Npb24gY29udGFpbmluZyAgJHgkICB0aGF0IHdlIGtub3cgaGFzIHRvIGJlIGVxdWFsIHRvIGEga25vd24gcXVhbnRpdHkgICR6JCAuIFNvbHZpbmcgZm9yICR4JCAgaXMgbm93IHNpbXBseSBhbGdlYnJhOgoKJCQKeCA9IC1sXGZyYWN7bnAtelxzcXJ0e25wKGwtcCl9fXtuKGwtcCt6XHNxcnR7bnAobC1wKX0pfQokJAp3aGljaCBpczoKCmBgYHtyfQpsIDwtIGxvc3NfcGVyX2ZvcmVjbG9zdXJlCnogPC0gcW5vcm0oMC4wMSkKeCA8LSAtbCooIG4qcCAtIHoqc3FydChuKnAqKDEtcCkpKS8gKCBuKigxLXApICsgeipzcXJ0KG4qcCooMS1wKSkpCngKYGBgCgpPdXIgaW50ZXJlc3QgcmF0ZSBub3cgZ29lcyB1cCB0byAwLjAzNS4gVGhpcyBpcyBzdGlsbCBhIHZlcnkgY29tcGV0aXRpdmUgaW50ZXJlc3QgcmF0ZS4gQnkgY2hvb3NpbmcgdGhpcyBpbnRlcmVzdCByYXRlLCB3ZSBub3cgaGF2ZSBhbiBleHBlY3RlZCBwcm9maXQgcGVyIGxvYW4gb2Y6CgpgYGB7cn0KbG9zc19wZXJfZm9yZWNsb3N1cmUqcCArIHgqKDEtcCkKYGBgCgp3aGljaCBpcyBhIHRvdGFsIGV4cGVjdGVkIHByb2ZpdCBvZiBhYm91dDoKCmBgYHtyfQpuKihsb3NzX3Blcl9mb3JlY2xvc3VyZSpwICsgeCooMS1wKSkKYGBgCgpkb2xsYXJzIQoKV2UgY2FuIHJ1biBhIE1vbnRlIENhcmxvIHNpbXVsYXRpb24gdG8gZG91YmxlIGNoZWNrIG91ciB0aGVvcmV0aWNhbCBhcHByb3hpbWF0aW9uczoKCmBgYHtyfQpCIDwtIDEwMDAwMApwcm9maXQgPC0gcmVwbGljYXRlKEIsIHsKICAgIGRyYXdzIDwtIHNhbXBsZSggYyh4LCBsb3NzX3Blcl9mb3JlY2xvc3VyZSksIG4sIAogICAgICAgICAgICAgICAgICAgICAgICBwcm9iPWMoMS1wLCBwKSwgcmVwbGFjZSA9IFRSVUUpIAogICAgc3VtKGRyYXdzKQp9KQptZWFuKHByb2ZpdCkKYGBgCgpgYGB7cn0KbWVhbihwcm9maXQ8MCkKYGBgCgojIyAxNC4xMS4yIFRoZSBCaWcgc2hvcnQKCk9uZSBvZiB5b3VyIGVtcGxveWVlcyBwb2ludHMgb3V0IHRoYXQgc2luY2UgdGhlIGJhbmsgaXMgbWFraW5nIDIsMTI0IGRvbGxhcnMgcGVyIGxvYW4sIHRoZSBiYW5rIHNob3VsZCBnaXZlIG91dCBtb3JlIGxvYW5zISBXaHkganVzdCAgJG4kID8gWW91IGV4cGxhaW4gdGhhdCBmaW5kaW5nIHRob3NlICRuJCAgY2xpZW50cyB3YXMgaGFyZC4gWW91IG5lZWQgYSBncm91cCB0aGF0IGlzIHByZWRpY3RhYmxlIGFuZCB0aGF0IGtlZXBzIHRoZSBjaGFuY2VzIG9mIGRlZmF1bHRzIGxvdy4gSGUgdGhlbiBwb2ludHMgb3V0IHRoYXQgZXZlbiBpZiB0aGUgcHJvYmFiaWxpdHkgb2YgZGVmYXVsdCBpcyBoaWdoZXIsIGFzIGxvbmcgYXMgb3VyIGV4cGVjdGVkIHZhbHVlIGlzIHBvc2l0aXZlLCB5b3UgY2FuIG1pbmltaXplIHlvdXIgY2hhbmNlcyBvZiBsb3NzZXMgYnkgaW5jcmVhc2luZyAkbiQgIGFuZCByZWx5aW5nIG9uIHRoZSBsYXcgb2YgbGFyZ2UgbnVtYmVycy4KCkhlIGNsYWltcyB0aGF0IGV2ZW4gaWYgdGhlIGRlZmF1bHQgcmF0ZSBpcyB0d2ljZSBhcyBoaWdoLCBzYXkgNCUsIGlmIHdlIHNldCB0aGUgcmF0ZSBqdXN0IGEgYml0IGhpZ2hlciB0aGFuIHRoaXMgdmFsdWU6CgpgYGB7cn0KcCA8LSAwLjA0CnIgPC0gKC0gbG9zc19wZXJfZm9yZWNsb3N1cmUqcC8oMS1wKSkgLyAxODAwMDAKcgpgYGAKCndlIHdpbGwgcHJvZml0LiBBdCA1JSwgd2UgYXJlIGd1YXJhbnRlZWQgYSBwb3NpdGl2ZSBleHBlY3RlZCB2YWx1ZSBvZjoKCmBgYHtyfQpyIDwtIDAuMDUKeCA8LSByKjE4MDAwMApsb3NzX3Blcl9mb3JlY2xvc3VyZSpwICsgeCAqICgxLXApCmBgYAoKYW5kIGNhbiBtaW5pbWl6ZSBvdXIgY2hhbmNlcyBvZiBsb3NpbmcgbW9uZXkgYnkgc2ltcGx5IGluY3JlYXNpbmcgJG4kICBzaW5jZToKCiQkClByKFM8MCk9UHIoWjwtXGZyYWN7RVtTXX17U0VbU119KQokJAoKd2l0aCAgJFokIGEgc3RhbmRhcmQgbm9ybWFsIHJhbmRvbSB2YXJpYWJsZSBhcyBzaG93biBlYXJsaWVyLiBJZiB3ZSBkZWZpbmUgICTOvCQgYW5kICTPgyQgIHRvIGJlIHRoZSBleHBlY3RlZCB2YWx1ZSBhbmQgc3RhbmRhcmQgZGV2aWF0aW9uIG9mIHRoZSB1cm4sIHJlc3BlY3RpdmVseSAodGhhdCBpcyBvZiBhIHNpbmdsZSBsb2FuKSwgdXNpbmcgdGhlIGZvcm11bGFzIGFib3ZlIHdlIGhhdmU6ICRFW1NdPW5cbXUkIGFuZCAkU0VbU109XHNxcnR7bn1cc2lnbWEkLiBTbyBpZiB3ZSBkZWZpbmUgJHo9JCBgcW5vcm0oMC4wMSlgLCB3ZSBoYXZlOgoKJCQKLVxmcmFje25cbXV9e1xzcXJ0e259XHNpZ21hfSA9IC1cZnJhY3tcc3FydHtufVxtdX17XHNpZ21hfSA9IHoKJCQKCndoaWNoIGltcGxpZXMgdGhhdCBpZiB3ZSBsZXQ6CgokJApuID49IHpeMlxzaWdtYV4yL1xtdV4yCiQkCgp3ZSBhcmUgZ3VhcmFudGVlZCB0byBoYXZlIGEgcHJvYmFiaWxpdHkgb2YgbGVzcyB0aGFuIDAuMDEuIFRoZSBpbXBsaWNhdGlvbiBpcyB0aGF0LCBhcyBsb25nIGFzICAkzrwkICBpcyBwb3NpdGl2ZSwgd2UgY2FuIGZpbmQgYW4gICRuJCAgdGhhdCBtaW5pbWl6ZXMgdGhlIHByb2JhYmlsaXR5IG9mIGEgbG9zcy4gVGhpcyBpcyBhIGZvcm0gb2YgdGhlIGxhdyBvZiBsYXJnZSBudW1iZXJzOiB3aGVuICAkbiQgIGlzIGxhcmdlLCBvdXIgYXZlcmFnZSBlYXJuaW5ncyBwZXIgbG9hbiBjb252ZXJnZXMgdG8gdGhlIGV4cGVjdGVkIGVhcm5pbmcgICTOvCQgLgpXaXRoICAkeCQgIGZpeGVkLCBub3cgd2UgY2FuIGFzayB3aGF0ICAkbiQgIGRvIHdlIG5lZWQgZm9yIHRoZSBwcm9iYWJpbGl0eSB0byBiZSAwLjAxPyBJbiBvdXIgZXhhbXBsZSwgaWYgd2UgZ2l2ZSBvdXQ6CgpgYGB7cn0KeiA8LSBxbm9ybSgwLjAxKQpuIDwtIGNlaWxpbmcoKHpeMiooeC1sKV4yKnAqKDEtcCkpLyhsKnAgKyB4KigxLXApKV4yKQpuCmBgYAoKbG9hbnMsIHRoZSBwcm9iYWJpbGl0eSBvZiBsb3NpbmcgaXMgYWJvdXQgMC4wMSBhbmQgd2UgYXJlIGV4cGVjdGVkIHRvIGVhcm4gYSB0b3RhbCBvZgoKYGBge3J9Cm4qKGxvc3NfcGVyX2ZvcmVjbG9zdXJlKnAgKyB4ICogKDEtcCkpCmBgYAoKZG9sbGFycyEgV2UgY2FuIGNvbmZpcm0gdGhpcyB3aXRoIGEgTW9udGUgQ2FybG8gc2ltdWxhdGlvbjoKCmBgYHtyfQpwIDwtIDAuMDQKeCA8LSAwLjA1KjE4MDAwMApwcm9maXQgPC0gcmVwbGljYXRlKEIsIHsKICAgIGRyYXdzIDwtIHNhbXBsZSggYyh4LCBsb3NzX3Blcl9mb3JlY2xvc3VyZSksIG4sIAogICAgICAgICAgICAgICAgICAgICAgICBwcm9iPWMoMS1wLCBwKSwgcmVwbGFjZSA9IFRSVUUpIAogICAgc3VtKGRyYXdzKQp9KQptZWFuKHByb2ZpdCkKYGBgCgpUaGlzIHNlZW1zIGxpa2UgYSBubyBicmFpbmVyLiBBcyBhIHJlc3VsdCwgeW91ciBjb2xsZWFndWUgZGVjaWRlcyB0byBsZWF2ZSB5b3VyIGJhbmsgYW5kIHN0YXJ0IGhpcyBvd24gaGlnaC1yaXNrIG1vcnRnYWdlIGNvbXBhbnkuIEEgZmV3IG1vbnRocyBsYXRlciwgeW91ciBjb2xsZWFndWXigJlzIGJhbmsgaGFzIGdvbmUgYmFua3J1cHQuIEEgYm9vayBpcyB3cml0dGVuIGFuZCBldmVudHVhbGx5IGEgbW92aWUgaXMgbWFkZSByZWxhdGluZyB0aGUgbWlzdGFrZSB5b3VyIGZyaWVuZCwgYW5kIG1hbnkgb3RoZXJzLCBtYWRlLiBXaGF0IGhhcHBlbmVkPwoKWW91ciBjb2xsZWFndWXigJlzIHNjaGVtZSB3YXMgbWFpbmx5IGJhc2VkIG9uIHRoaXMgbWF0aGVtYXRpY2FsIGZvcm11bGE6CgokJApTRVsoWF8xK1hfMisuLi4rWF9uKS9uXT1cc2lnbWEvXHNxcnR7bn0KJCQKCkJ5IG1ha2luZyAgJG4kICBsYXJnZSwgd2UgbWluaW1pemUgdGhlIHN0YW5kYXJkIGVycm9yIG9mIG91ciBwZXItbG9hbiBwcm9maXQuIEhvd2V2ZXIsIGZvciB0aGlzIHJ1bGUgdG8gaG9sZCwgdGhlICAkWCRzIG11c3QgYmUgaW5kZXBlbmRlbnQgZHJhd3M6IG9uZSBwZXJzb24gZGVmYXVsdGluZyBtdXN0IGJlIGluZGVwZW5kZW50IG9mIG90aGVycyBkZWZhdWx0aW5nLiBOb3RlIHRoYXQgaW4gdGhlIGNhc2Ugb2YgYXZlcmFnaW5nIHRoZSBzYW1lIGV2ZW50IG92ZXIgYW5kIG92ZXIsIGFuIGV4dHJlbWUgZXhhbXBsZSBvZiBldmVudHMgdGhhdCBhcmUgbm90IGluZGVwZW5kZW50LCB3ZSBnZXQgYSBzdGFuZGFyZCBlcnJvciB0aGF0IGlzICAkXHNxcnR7bn0kICB0aW1lcyBiaWdnZXI6CgpgYGB7cn0KcCA8LSAwLjA0CnggPC0gMC4wNSoxODAwMDAKcHJvZml0IDwtIHJlcGxpY2F0ZShCLCB7CiAgICBuZXdfcCA8LSAwLjA0ICsgc2FtcGxlKHNlcSgtMC4wMSwgMC4wMSwgbGVuZ3RoID0gMTAwKSwgMSkKICAgIGRyYXdzIDwtIHNhbXBsZSggYyh4LCBsb3NzX3Blcl9mb3JlY2xvc3VyZSksIG4sIAogICAgICAgICAgICAgICAgICAgICAgICBwcm9iPWMoMS1uZXdfcCwgbmV3X3ApLCByZXBsYWNlID0gVFJVRSkgCiAgICBzdW0oZHJhd3MpCn0pCmBgYAoKTm90ZSB0aGF0IG91ciBleHBlY3RlZCBwcm9maXQgaXMgc3RpbGwgbGFyZ2U6CgpgYGB7cn0KbWVhbihwcm9maXQpCmBgYAoKSG93ZXZlciwgdGhlIHByb2JhYmlsaXR5IG9mIHRoZSBiYW5rIGhhdmluZyBuZWdhdGl2ZSBlYXJuaW5ncyBzaG9vdHMgdXAgdG86CgpgYGB7cn0KbWVhbihwcm9maXQ8MCkKYGBgCgpFdmVuIHNjYXJpZXIgaXMgdGhhdCB0aGUgcHJvYmFiaWxpdHkgb2YgbG9zaW5nIG1vcmUgdGhhbiAxMCBtaWxsaW9uIGRvbGxhcnMgaXM6CgpgYGB7cn0KbWVhbihwcm9maXQgPCAtMTAwMDAwMDApCmBgYAoKVG8gdW5kZXJzdGFuZCBob3cgdGhpcyBoYXBwZW5zIGxvb2sgYXQgdGhlIGRpc3RyaWJ1dGlvbjoKCmBgYHtyfQpkYXRhLmZyYW1lKHByb2ZpdF9pbl9taWxsaW9ucz1wcm9maXQvMTBeNikgJT4lIAogIGdncGxvdChhZXMocHJvZml0X2luX21pbGxpb25zKSkgKyAKICBnZW9tX2hpc3RvZ3JhbShjb2xvcj0iYmxhY2siLCBiaW53aWR0aCA9IDUpCmBgYAoKVGhlIHRoZW9yeSBjb21wbGV0ZWx5IGJyZWFrcyBkb3duIGFuZCB0aGUgcmFuZG9tIHZhcmlhYmxlIGhhcyBtdWNoIG1vcmUgdmFyaWFiaWxpdHkgdGhhbiBleHBlY3RlZC4gVGhlIGZpbmFuY2lhbCBtZWx0ZG93biBvZiAyMDA3IHdhcyBkdWUsIGFtb25nIG90aGVyIHRoaW5ncywgdG8gZmluYW5jaWFsIOKAnGV4cGVydHPigJ0gYXNzdW1pbmcgaW5kZXBlbmRlbmNlIHdoZW4gdGhlcmUgd2FzIG5vbmUuCgojICoqMTQuMTIgRXhlcmNpc2UqKgoKMS4gQ3JlYXRlIGEgcmFuZG9tIHZhcmlhYmxlICAkUyQgIHdpdGggdGhlIGVhcm5pbmdzIG9mIHlvdXIgYmFuayBpZiB5b3UgZ2l2ZSBvdXQgMTAsMDAwIGxvYW5zLCB0aGUgZGVmYXVsdCByYXRlIGlzIDAuMywgYW5kIHlvdSBsb3NlICQyMDAsMDAwIGluIGVhY2ggZm9yZWNsb3N1cmUuIEhpbnQ6IHVzZSB0aGUgY29kZSB3ZSBzaG93ZWQgaW4gdGhlIHByZXZpb3VzIHNlY3Rpb24sIGJ1dCBjaGFuZ2UgdGhlIHBhcmFtZXRlcnMuCgoyLiBSdW4gYSBNb250ZSBDYXJsbyBzaW11bGF0aW9uIHdpdGggMTAsMDAwIG91dGNvbWVzIGZvciAgJFMkIC4gTWFrZSBhIGhpc3RvZ3JhbSBvZiB0aGUgcmVzdWx0cy4KCjMuIFdoYXQgaXMgdGhlIGV4cGVjdGVkIHZhbHVlIG9mICAkUyQgPwoKNC4gV2hhdCBpcyB0aGUgc3RhbmRhcmQgZXJyb3Igb2YgICRTJD8KCjUuIFN1cHBvc2Ugd2UgZ2l2ZSBvdXQgbG9hbnMgZm9yICQxODAsMDAwLiBXaGF0IHNob3VsZCB0aGUgaW50ZXJlc3QgcmF0ZSBiZSBzbyB0aGF0IG91ciBleHBlY3RlZCB2YWx1ZSBpcyAwPwoKNi4gKEhhcmRlcikgV2hhdCBzaG91bGQgdGhlIGludGVyZXN0IHJhdGUgYmUgc28gdGhhdCB0aGUgY2hhbmNlIG9mIGxvc2luZyBtb25leSBpcyAxIGluIDIwPyBJbiBtYXRoIG5vdGF0aW9uLCB3aGF0IHNob3VsZCB0aGUgaW50ZXJlc3QgcmF0ZSBiZSBzbyB0aGF0ICAkUHIoUzwwKT0wLjA1JCAgPwoKNy4gSWYgdGhlIGJhbmsgd2FudHMgdG8gbWluaW1pemUgdGhlIHByb2JhYmlsaXRpZXMgb2YgbG9zaW5nIG1vbmV5LCB3aGljaCBvZiB0aGUgZm9sbG93aW5nIGRvZXMgbm90IG1ha2UgaW50ZXJlc3QgcmF0ZXMgZ28gdXA/CgpBLiBBIHNtYWxsZXIgcG9vbCBvZiBsb2Fucy4KQi4gQSBsYXJnZXIgcHJvYmFiaWxpdHkgb2YgZGVmYXVsdC4KQy4gQSBzbWFsbGVyIHJlcXVpcmVkIHByb2JhYmlsaXR5IG9mIGxvc2luZyBtb25leS4KRC4gVGhlIG51bWJlciBvZiBNb250ZSBDYXJsbyBzaW11bGF0aW9ucy4KCgo=</div>
 
 
 
