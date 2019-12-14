@@ -643,7 +643,7 @@ tidy_to_DEG <- function(tidy_df){
 save(tidy_to_DEG, file='./BrainSpan_miR_analysis/tidy_to_DEG.RData') #tidy miRNA dataset to DEG result 
 ```
 
-```{r}
+```{r fig.height=7, fig.width=10, dpi=300}
 miR_DFC_DE <- miR_DFC %>% 
               tidy_to_DEG() %>% 
               mutate(Gender_specific_by_volume = case_when((Average_expression > 4 & Fold_Enrichment > 1)~"Female_enriched",
@@ -667,10 +667,10 @@ MA_miR_age_group <- miR_DFC_DE %>%
   geom_hline(yintercept = 1, colour="darkred", linetype="dashed", alpha=0.5) + 
   geom_hline(yintercept = -1, colour="darkblue", linetype="dashed", alpha=0.5) + 
   geom_vline(xintercept = 4, colour="darkgrey", linetype="dashed") +
-  geom_text(aes(x=11, y=4, label="FE>1, Average expression>4"), size=2.5, color="darkred") +
-  geom_text(aes(x=11, y=-4, label="FE<1, Average expression>4"), size=2.5, color="darkblue") +
+  geom_text(aes(x=11, y=4, label="FE>1, Average expression>4"), size=4, color="darkred") +
+  geom_text(aes(x=11, y=-4, label="FE<1, Average expression>4"), size=4, color="darkblue") +
   coord_cartesian(xlim =c(-5, 20), ylim = c(-4, 4)) +
-  geom_text_repel(aes(label=ifelse((Average_expression > 4 & abs(Fold_Enrichment) > 1), as.character(miRNA), "")), size=2, force=8) +
+  geom_text_repel(aes(label=ifelse((Average_expression > 4 & abs(Fold_Enrichment) > 1), as.character(miRNA), "")), size=3.5, force=8) +
   theme_bw() +
   theme(legend.position="none",
         axis.title.x = element_text(size=8),
@@ -693,8 +693,8 @@ VOL_miR_age_group <- miR_DFC_DE %>%
   geom_vline(xintercept = -1, colour="darkblue", linetype="dashed", alpha=0.5) + 
   geom_vline(xintercept = 1, colour="darkred", linetype="dashed") +
   coord_cartesian(xlim =c(-5, 5), ylim = c(0, 4)) +
-   geom_text(aes(x=4, y=1.5, label="p-value<0.05"), size=3, color="darkgrey") +
-  geom_text_repel(aes(label=ifelse((Q_score > 1.3 & abs(Fold_Enrichment) > 1), as.character(miRNA), "")), size=2, force=8) +
+   geom_text(aes(x=4, y=1.5, label="p-value<0.05"), size=4, color="darkgrey") +
+  geom_text_repel(aes(label=ifelse((Q_score > 1.3 & abs(Fold_Enrichment) > 1), as.character(miRNA), "")), size=3.5, force=8) +
   theme_bw() +
   theme(legend.position=c(0.8, 0.91), 
         legend.title = element_blank(),
@@ -766,7 +766,7 @@ load("./BrainSpan_miR_analysis/youth_specific_gender_miRNA.RData")
 #Make slope chart
 MA_adult <- adult_miR %>% ggplot(aes(age_group, Fold_Enrichment, group=miRNA, color=Gender_specific_by_volume)) +
                 geom_line()+
-                geom_text_repel(aes(label=ifelse(age_group=="Adult",miRNA,"")), size=2.5, nudge_x=-0.01, nudge_y=0.01, force=25)+
+                geom_text_repel(aes(label=ifelse(age_group=="Adult",miRNA,"")), size=3.5, nudge_x=-0.01, nudge_y=0.01, force=25)+
                 geom_point(size=3.5)+
                 scale_x_discrete(limits=c("Youth", "Adult")) +
                 coord_cartesian(ylim = c(-3, 3)) +
@@ -778,7 +778,7 @@ MA_adult <- adult_miR %>% ggplot(aes(age_group, Fold_Enrichment, group=miRNA, co
 
 MA_youth <- youth_miR %>% ggplot(aes(age_group, Fold_Enrichment, group=miRNA, color=Gender_specific_by_volume)) +
                 geom_line()+
-                geom_text_repel(aes(label=ifelse(age_group=="Youth",miRNA,"")), size=2.5, nudge_x=-0.01, force=30)+
+                geom_text_repel(aes(label=ifelse(age_group=="Youth",miRNA,"")), size=3.5, nudge_x=-0.01, force=30)+
                 geom_point(size=3.5)+
                 scale_x_discrete(limits=c("Youth", "Adult")) +
                 coord_cartesian(ylim = c(-3, 3)) +
@@ -981,9 +981,9 @@ CUM_youth <- ggplot() +
   stat_ecdf(aes(Youth$Fold_Enrichment),color="darkgrey") +
   stat_ecdf(aes(Youth %>% filter(gene_symbol %in% youth_Fmir_target) %>% .$Fold_Enrichment), color="red") +
   stat_ecdf(aes(Youth %>% filter(gene_symbol %in% youth_Mmir_target) %>% .$Fold_Enrichment), color="blue") +
-  geom_text(aes(x=-1, y=1, label = "Target of female specific miRNA in DFC"), color = "red", hjust=0, size=2.5) + 
-  geom_text(aes(x=-1, y=0.92, label = "Target of male specific miRNA in DFC"), color = "blue", hjust=0, size=2.5) +
-  geom_text(aes(x=-1, y=0.84, label = "Total mRNA in DFC"), color = "Darkgrey", hjust=0, size=2.5) + 
+  geom_text(aes(x=-1, y=1, label = "Target of female specific miRNA in DFC"), color = "red", hjust=0, size=4) + 
+  geom_text(aes(x=-1, y=0.92, label = "Target of male specific miRNA in DFC"), color = "blue", hjust=0, size=4) +
+  geom_text(aes(x=-1, y=0.84, label = "Total mRNA in DFC"), color = "Darkgrey", hjust=0, size=4) + 
   xlim(c(-1,1)) +
   ylim(c(0,1))+
   xlab("Fold Enrichment [log2(Female/Male)]")+
@@ -998,9 +998,9 @@ CUM_adult <- ggplot() +
   stat_ecdf(aes(Adult$Fold_Enrichment),color="darkgrey") +
   stat_ecdf(aes(Adult %>% filter(gene_symbol %in% adult_FmiR_target) %>% .$Fold_Enrichment), color="red") +
   stat_ecdf(aes(Adult %>% filter(gene_symbol %in% adult_MmiR_target) %>% .$Fold_Enrichment), color="blue") +
-  geom_text(aes(x=-1, y=1, label = "Target of female specific miRNA in DFC"), color = "red", hjust=0, size=2.5) + 
-  geom_text(aes(x=-1, y=0.92, label = "Target of male specific miRNA in DFC"), color = "blue", hjust=0, size=2.5) +
-  geom_text(aes(x=-1, y=0.84, label = "Total mRNA in DFC"), color = "Darkgrey", hjust=0, size=2.5) + 
+  geom_text(aes(x=-1, y=1, label = "Target of female specific miRNA in DFC"), color = "red", hjust=0, size=4) + 
+  geom_text(aes(x=-1, y=0.92, label = "Target of male specific miRNA in DFC"), color = "blue", hjust=0, size=4) +
+  geom_text(aes(x=-1, y=0.84, label = "Total mRNA in DFC"), color = "Darkgrey", hjust=0, size=4) + 
   xlim(c(-1,1)) +
   ylim(c(0,1))+
   xlab("Fold Enrichment [log2(Female/Male)]")+
@@ -1018,7 +1018,7 @@ save(CUM_sum, file='./BrainSpan_miR_analysis/bg_target_cumilative.RData')
 CUM_sum
 ```
 
-```{r}
+```{r fig.height=7}
 load('./BrainSpan_miR_analysis/bg_target_cumilative.RData')
 load('./BrainSpan_miR_analysis/SLOPE_age.RData')
 SLOPE_CUM <-  ggdraw() + 
@@ -1032,7 +1032,7 @@ save(SLOPE_CUM, file='./BrainSpan_miR_analysis/SLOPE_CUM.RData')
 # 5.정리 
 
 plot1 : 
-```{r}
+```{r fig.height=7}
 load('./BrainSpan_miR_analysis/DEGplot_age.RData')
 load('./BrainSpan_miR_analysis/SLOPE_CUM.RData')
 
@@ -1044,7 +1044,7 @@ DEGplot_age
 > 이는 DFC region에 성별에 의하여 서로 상이한 발현을 보이는 miRNA가 없을 것이라고도 생각할 수 있으나, donor의 수가 제한적이므로, Average Expression 기준으로 cut-off를 넘은 miRNA 전체를 성별에 따라 발현이 다른 miRNA 후보로 선정하였다. 
 
 plot2 :
-```{r}
+```{r fig.height=7}
 SLOPE_CUM
 ```
 
