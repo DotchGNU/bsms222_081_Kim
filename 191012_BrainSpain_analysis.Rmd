@@ -592,7 +592,7 @@ Vol_miR
 
 > miRNA expression에 있어서 normal distribution은 negative bionomeal distribution에 비하여 보수적인 검정이었을 것이므로 negative bionomeal distribution이나 poison distribution을 통한 statistical significant test도 의미가 있을 것. 
 
-> TCGA data LGG(Low Grade Glioma) data와 함께 비교해보기 (download 자동화 tool 익히기) [link](https://portal.gdc.cancer.gov/exploration?facetTab=cases&filters=%7B%22op%22%3A%22and%22%2C%22content%22%3A%5B%7B%22op%22%3A%22in%22%2C%22content%22%3A%7B%22field%22%3A%22cases.demographic.vital_status%22%2C%22value%22%3A%5B%22Alive%22%5D%7D%7D%2C%7B%22op%22%3A%22in%22%2C%22content%22%3A%7B%22field%22%3A%22cases.primary_site%22%2C%22value%22%3A%5B%22Brain%22%5D%7D%7D%2C%7B%22op%22%3A%22in%22%2C%22content%22%3A%7B%22field%22%3A%22cases.project.project_id%22%2C%22value%22%3A%5B%22TCGA-LGG%22%5D%7D%7D%5D%7D) --- keep
+
 
 
 ### 3.3.2 Gender specific gene identification 
@@ -1058,3 +1058,29 @@ SLOPE_CUM
   
   
   아쉽게도 본 데이터들은 통계적 유의성을 확보하기에 부족한 donor 수를 지니고 있어 정확한 분석이 어렵다. 이를 재확인 하기 위하여 TCGA의 LGG(Low Grade Glioma)환자들의 miRNA expression 정보를 추가하여 추가 분석을 진행하는 방향이 바람직할 것으로 보인다. 또한 mouse에서의 발현 양상도 이를 반영하는지 확인하여, loss-of-function study, gain-of-function study를 할 수 있는 실험 모델을 확립하고 동물실험을 통하여 DFC에서의 해당 miRNA들의 역할을 규명할 수 있다면, 이번 분석의 진위를 가릴 수 있을 것으로 보인다.
+  
+  
+# 6. Reviewer comment_Update_191214
+
+•	우선 그래프를 살펴보면 왼쪽은 fold-enrichment와 average expression에 관하여 표현하였고 오른쪽은 pvalue와 fold enrichment에 관하여 표현하였다. 왼쪽 그래프부터 살펴보면 fold enrichment 즉, 두 값을 비교하여 설명하였는데 youth 시기에는 여자-mirna는 증가하는 경향을 보이고, 남자또한 증가하는 경향을 보인다. Average expression의 차이가 2배 이상 나는 값들을 표현한것으로 보인다. (average expression>4임을 보았을때 ). 또한 fold enrichment값을 보앗을때 남자와 여자가 각각 성별결정에 유의미한 mirna들을 표현하였다. 
+
+•	오른쪽 그래프를 살펴보면 pvalue가 -log10값을 기준으로 0~1사이에 존재하는데 대부분 0에 존재하지 않고 0~1사이에 존재하므로 유의값으로써 신뢰도가 떨어지는 그래프라고 볼수 있다. 
+
+•	장점으로는 남여 성별 결정의 결정적인 mirna 관하여 작성자의 의견 즉 2배차이 이상 나는 것들을 모아서 표현한 점이 잘한것같다.
+
+•	우선 이 그래프의 절반은 필요가 없다. 말하고자 하는 바는 아마 어렸을때와 성인것을 비교함으로 보아서, 성별결정에 어떠한 mirna가 영향을 미치는지에 관하여 그림을 그리신것같다. 우선 p값과 fold enrichment를 나타낸것은 의미가 없는것같다. P값은 유의 값으로 그저 이 통계결과가 신뢰도가 있는지에 관한 여부만 나타낼뿐 그 것으로 해석할것은 없기 때문이다. 왼쪽의 그래프를 보면 성별결정에 결정적인 역할을 하는 mirna에 관하여 적었는데, 이들이 어떠한 mi rna인지 잘 보이지 않는다. 
+
+  > 해당 내용을 보완하여 volcano plot을 다시 ploting하고자 하였습니다. 데이터의 샘플이 충분히 많지 않아 발생한 통계적 유의성의 한계문제로 아래 TCGA data를 추가하여 재분석하고자 하였습니다. 
+  
+  > TCGA data LGG(Low Grade Glioma) data [link](https://portal.gdc.cancer.gov/exploration?facetTab=cases&filters=%7B%22op%22%3A%22and%22%2C%22content%22%3A%5B%7B%22op%22%3A%22in%22%2C%22content%22%3A%7B%22field%22%3A%22cases.demographic.vital_status%22%2C%22value%22%3A%5B%22Alive%22%5D%7D%7D%2C%7B%22op%22%3A%22in%22%2C%22content%22%3A%7B%22field%22%3A%22cases.primary_site%22%2C%22value%22%3A%5B%22Brain%22%5D%7D%7D%2C%7B%22op%22%3A%22in%22%2C%22content%22%3A%7B%22field%22%3A%22cases.project.project_id%22%2C%22value%22%3A%5B%22TCGA-LGG%22%5D%7D%7D%5D%7D)
+  
+  > 하지만 data가 정리되어 있는 방식이 BrainSpan과 TCGA가 상이하여 같은 분석을 하기 위하여 새로운 스크립트를 많이 추가해야한다는 번거로움이 있었습니다.
+  
+  > 우선 이 figure의 목적은 통계적유의성에는 한계가 있으나, 성별에 따라 연령이 경과할수록 변화하는 miRNA가 존재한다는 것을 보이고, 이를 바탕으로 다음 figure에서 연령 추적 결과 실제 연령에 따라 gender specificity가 변화하며, target repression 효과가 존재하는 것을 보인 것으로 TCGA data까지 추가 분석을 하는 것은 시간 내에 무리가 있다고 판단되었습니다. 해당 데이터만으로도 과제에서 주장하고자 하는 내용을 뒷받침할 수 있다고 판단하여 이 부분에 대하여서는 기존 원안을 유지하였습니다. 
+
+•	내가 이 그래프를 고치게 되면 point값을 좀더 키워 누구나 알아볼수 있게끔 mirna를 쓰고 싶다. 
+
+  > figure 크기와 폰트 사이즈를 조정하였습니다. 
+
+
+ --- keep
